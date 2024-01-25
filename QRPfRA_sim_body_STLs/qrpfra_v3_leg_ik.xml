@@ -1,17 +1,17 @@
-<mujoco model="qrpfra">
+<mujoco model="qrpfra_v3_ik_model">
     <compiler angle="degree" coordinate="local" inertiafromgeom="true" convexhull="true"/>
     <option integrator="RK4" timestep="0.01" gravity="0 0 -9.81" density="1.24"/>
 
     <default>
         <joint armature="1" damping="1" limited="true"/>
-        <geom conaffinity="1" condim="3" density="1.24" friction="1 0.5 0.5" margin="0.01" rgba="0.8 0.6 0.4 1"/>
-        
+        <geom conaffinity="0" condim="3" density="1.24" friction="1 0.5 0.5" margin="0.01" rgba="0.8 0.6 0.4 1"/>
+
         <default class="servo_motors">
-            <position ctrllimited="true" ctrlrange="-1 1" kp="90" gear="0.95"/>
+            <position ctrllimited="true" ctrlrange="-100 100" gear="95"/>
         </default>
-        
+
         <default class="joint_def">
-            <joint pos="0 0 0" range="-60 60" type="hinge" damping="12"/>
+            <joint pos="0 0 0" range="-60 60" type="hinge" damping="150"/>
         </default>
 
         <default class="Left_foot_Site">
@@ -35,11 +35,11 @@
     </asset>
 
     <worldbody>
-        <camera name="track" mode="trackcom" pos="0 -1 0.3" xyaxes="1 0 0 0 0 1"/>
-
         <body name="base_link" pos="0 0 0.5">
-            <geom type="mesh" mesh="main_body" mass="2" friction="0.3" contype="1" conaffinity="1" density="1240" />
-            <joint limited="false" margin="0.01" name="root" pos="0 0 0" type="free" stiffness="0" damping="0" frictionloss="0" armature="0"/>
+            <camera name="track" mode="trackcom" pos="0 -1 0.3" xyaxes="1 0 0 0 0 1"/>
+
+            <geom type="mesh" mesh="main_body" mass="2" friction="0.3" density="1240" />
+            <!--joint limited="true" margin="0.01" name="root" pos="0 0 0" type="free" stiffness="0" damping="0" frictionloss="0" armature="0"/-->
 
             <site name="base_link_Site" pos="0 0 0" type="box" size="0.03 0.05 0.01"/>
 
@@ -52,16 +52,16 @@
             <site name="RR_Leg_ref" pos="0.04 -0.0975 0.0025"/>
 
             <body name="front_Left_Hind_Limb" pos="-0.04 0.065 0.013">
-                <joint class="joint_def" axis="0 1 0" name="FL_hind_to_base" />
-                <geom type="mesh" mesh="Left_Hind_Limb" mass="0.150" contype="1" conaffinity="1" density="1240"/>
+                <joint class="joint_def" axis="0 1 0" name="FL_hind_to_base"/>
+                <geom type="mesh" mesh="Left_Hind_Limb" mass="0.150" density="1240"/>
 
                 <body name="front_Left_MidLimb" pos="-0.025 0.023 -0.0105" euler="90 0 0">
-                    <joint class="joint_def" axis="1 0 0" name="FL_mid_to_base" />
-                    <geom type="mesh" mesh="Left_MidLimb" mass="0.350" contype="1" conaffinity="1" density="1240"/>
+                    <joint class="joint_def" axis="1 0 0" name="FL_mid_to_base"/>
+                    <geom type="mesh" mesh="Left_MidLimb" mass="0.350" density="1240"/>
 
                     <body name="front_Left_Wrist" pos="-0.005 -0.107 -0.013" euler="-90 0 0">
                         <joint class="joint_def" axis="1 0 0" name="FL_wrist_to_mid" />
-                        <geom type="mesh" mesh="Left_Wrist" mass="0.350" contype="1" conaffinity="1" density="1240"/>
+                        <geom type="mesh" mesh="Left_Wrist" mass="0.350" density="1240"/>
 
                         <site name="front_Left_Wrist_Site" class="Left_foot_Site"/>
 
@@ -69,7 +69,7 @@
                 </body>
             </body>
 
-            <body name="rear_Left_Hind_Limb" pos="-0.04 -0.12 0.013">
+            <!--body name="rear_Left_Hind_Limb" pos="-0.04 -0.12 0.013">
                 <joint class="joint_def" axis="0 1 0" name="RL_hind_to_base" />
                 <geom type="mesh" mesh="Left_Hind_Limb" mass="0.150" contype="1" conaffinity="1" density="1240"/>
 
@@ -121,30 +121,19 @@
 
                     </body>
                 </body>
-            </body>
+            </body-->
 
         </body>
 
     </worldbody>
 
-    <contact>
-        <exclude body1="base_link" body2="front_Left_Hind_Limb"/>
-        <exclude body1="base_link" body2="rear_Left_Hind_Limb"/>
-        <exclude body1="base_link" body2="front_Right_Hind_Limb"/>
-        <exclude body1="base_link" body2="rear_Right_Hind_Limb"/>
-
-        <exclude body1="base_link" body2="front_Left_MidLimb"/>
-        <exclude body1="base_link" body2="rear_Left_MidLimb"/>
-        <exclude body1="base_link" body2="front_Right_MidLimb"/>
-        <exclude body1="base_link" body2="rear_Right_MidLimb"/>
-    </contact>
 
     <actuator>
         <position class="servo_motors" joint="FL_hind_to_base" name="FL_Hind2Base"/>
         <position class="servo_motors" joint="FL_mid_to_base" name="FL_Mid2Hind"/>
         <position class="servo_motors" joint="FL_wrist_to_mid" name="FL_Wrist2Mid"/>
 
-        <position class="servo_motors" joint="RL_hind_to_base" name="RL_Hind2Base"/>
+        <!--position class="servo_motors" joint="RL_hind_to_base" name="RL_Hind2Base"/>
         <position class="servo_motors" joint="RL_mid_to_base" name="RL_Mid2Hind"/>
         <position class="servo_motors" joint="RL_wrist_to_mid" name="RL_Wrist2Mid"/>
 
@@ -154,34 +143,36 @@
 
         <position class="servo_motors" joint="RR_hind_to_base" name="RR_Hind2Base"/>
         <position class="servo_motors" joint="RR_mid_to_base" name="RR_Mid2Hind"/>
-        <position class="servo_motors" joint="RR_wrist_to_mid" name="RR_Wrist2Mid"/>
+        <position class="servo_motors" joint="RR_wrist_to_mid" name="RR_Wrist2Mid"/-->
     </actuator>
 
     <sensor>
-        <accelerometer name="accelerometer" site="base_link_Site"/> <!-- 0 1 2 -->
-        <gyro name="gyroscope" site="base_link_Site"/> <!-- 3 4 5 -->
-        <magnetometer name="magnetometer" site="base_link_Site"/> <!-- 6 7 8 -->
+        <!--accelerometer name="accelerometer" site="base_link_Site"/>
+        <gyro name="gyroscope" site="base_link_Site"/>
+        <magnetometer name="magnetometer" site="base_link_Site"/>
 
-        <framequat name="abs_orientation_of_the_base" objtype="site" objname="base_link_Site"/> <!-- 9 10 11 12 -->
+        <framequat name="abs_orientation_of_the_base" objtype="site" objname="base_link_Site"/-->
 
-        <jointpos name="FL_Hind2Base_angle" joint="FL_hind_to_base"/> <!-- 13 -->
-        <jointpos name="FL_Mid2Hind_angle" joint="FL_mid_to_base"/> <!-- 14 -->
-        <jointpos name="FL_Wrist2Mid_angle" joint="FL_wrist_to_mid"/> <!-- 15 -->
+        <framepos name="Left_Foot_pos" reftype="site" refname="FL_Leg_ref" objtype="site" objname="front_Left_Wrist_Site"/>
 
-        <jointpos name="RL_Hind2Base_angle" joint="RL_hind_to_base"/> <!-- 16 -->
-        <jointpos name="RL_Mid2Hind_angle" joint="RL_mid_to_base"/> <!-- 17 -->
-        <jointpos name="RL_Wrist2Mid_angle" joint="RL_wrist_to_mid"/> <!-- 18 -->
+        <jointpos name="FL_Hind2Base_angle" joint="FL_hind_to_base"/>
+        <jointpos name="FL_Mid2Hind_angle" joint="FL_mid_to_base"/>
+        <jointpos name="FL_Wrist2Mid_angle" joint="FL_wrist_to_mid"/>
 
-        <jointpos name="FR_Hind2Base_angle" joint="FR_hind_to_base"/> <!-- 19 -->
-        <jointpos name="FR_Mid2Hind_angle" joint="FR_mid_to_base"/> <!-- 20 -->
-        <jointpos name="FR_Wrist2Mid_angle" joint="FR_wrist_to_mid"/> <!-- 21 -->
+        <!--jointpos name="RL_Hind2Base_angle" joint="RL_hind_to_base"/>
+        <jointpos name="RL_Mid2Hind_angle" joint="RL_mid_to_base"/>
+        <jointpos name="RL_Wrist2Mid_angle" joint="RL_wrist_to_mid"/>
 
-        <jointpos name="RR_Hind2Base_angle" joint="RR_hind_to_base"/> <!-- 22 -->
-        <jointpos name="RR_Mid2Hind_angle" joint="RR_mid_to_base"/> <!-- 23 -->
-        <jointpos name="RR_Wrist2Mid_angle" joint="RR_wrist_to_mid"/> <!-- 24 -->
+        <jointpos name="FR_Hind2Base_angle" joint="FR_hind_to_base"/>
+        <jointpos name="FR_Mid2Hind_angle" joint="FR_mid_to_base"/>
+        <jointpos name="FR_Wrist2Mid_angle" joint="FR_wrist_to_mid"/>
 
-        <rangefinder name="head_rangefinder" site="head_rangefinder"/> <!-- 25 -->
-        <rangefinder name="rear_rangefinder" site="rear_rangefinder"/> <!-- 26 -->
+        <jointpos name="RR_Hind2Base_angle" joint="RR_hind_to_base"/>
+        <jointpos name="RR_Mid2Hind_angle" joint="RR_mid_to_base"/>
+        <jointpos name="RR_Wrist2Mid_angle" joint="RR_wrist_to_mid"/>
+
+        <rangefinder name="head_rangefinder" site="head_rangefinder"/>
+        <rangefinder name="rear_rangefinder" site="rear_rangefinder"/-->
     </sensor>
 
 </mujoco>
