@@ -22,7 +22,7 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         ],
     }
 
-    def __init__(self, xml_file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/qrpfra_v3_leg_ik_scene_left.xml", frame_skip=1, **kwargs):
+    def __init__(self, xml_file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/IK_Models/qrpfra_v3_leg_ik_scene_left.xml", frame_skip=1, **kwargs):
         utils.EzPickle.__init__(self, xml_file, frame_skip, **kwargs)
 
         MujocoEnv.__init__(

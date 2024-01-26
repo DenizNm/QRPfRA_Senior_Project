@@ -1,6 +1,6 @@
 <mujoco model="qrpfra">
     <compiler angle="degree" coordinate="local" inertiafromgeom="true" convexhull="true"/>
-    <option integrator="RK4" timestep="0.01" gravity="0 0 -9.81" density="1.24"/>
+    <option integrator="RK4" timestep="0.02" gravity="0 0 -9.81" density="1.24"/>
 
     <default>
         <joint armature="1" damping="1" limited="true"/>
