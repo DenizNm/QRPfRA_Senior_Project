@@ -1,5 +1,5 @@
 <mujoco model="qrpfra">
-    <include file="qrpfra_v3_leg_ik.xml"/>
+    <include file="qrpfra_v3_leg_ik_left.xml"/>
 
     <default>
         <joint armature="1" damping="1" limited="true"/>

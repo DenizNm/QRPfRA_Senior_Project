@@ -22,7 +22,7 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         ],
     }
 
-    def __init__(self, xml_file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/qrpfra_v3_leg_ik_scene_left.xml", frame_skip=1, **kwargs):
+    def __init__(self, xml_file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/qrpfra_v3_leg_ik_scene_right.xml", frame_skip=1, **kwargs):
         utils.EzPickle.__init__(self, xml_file, frame_skip, **kwargs)
 
         MujocoEnv.__init__(
@@ -48,7 +48,7 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         self.observation_space = Box(
             low=-np.inf, high=np.inf, shape=(obs_size,), dtype=np.float64
         )
-        self.left_leg_model = tf.keras.models.load_model("/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/IK_Models/left_legs_model")
+        self.left_leg_model = tf.keras.models.load_model("/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/IK_Models/right_legs_model")
 
     def step(self, action):
         print("Position of the foothold", action)
@@ -97,13 +97,13 @@ obs = env.reset()
 env.render_mode = "human"
 
 for i in range(10000000):
-    for i in range(-19, -9):
+    for i in range(-17, -7):
 
         #action = env.action_space.sample()
-        obs, reward, done, _, info = env.step([float(m) for m in [-0.04, i/100, i/100]])
-    for i in range(-9, -19, -1):
+        obs, reward, done, _, info = env.step([float(m) for m in [0.1, 0, i/100]])
+    for i in range(-7, -17, -1):
         #action = env.action_space.sample()
-        obs, reward, done, _, info = env.step([float(m) for m in [-0.04, i/100, i/100]])
+        obs, reward, done, _, info = env.step([float(m) for m in [0.1, 0, i/100]])
 
 
 env.close()
