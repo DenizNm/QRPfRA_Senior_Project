@@ -25,19 +25,19 @@
     </default>
 
     <asset>
-        <mesh name="main_body" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/QRPfRA_body_m.stl"/>
-        <mesh name="Left_Hind_Limb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/QRPfRA_left_hindlimb_m.stl"/>
-        <mesh name="Left_MidLimb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/QRPfRA_left_midlimb_m.stl"/>
-        <mesh name="Left_Wrist" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/QRPfRA_left_wrist_m.stl"/>
-        <mesh name="Right_Hind_Limb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/QRPfRA_right_hindlimb_m.stl"/>
-        <mesh name="Right_MidLimb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/QRPfRA_right_midlimb_m.stl"/>
-        <mesh name="Right_Wrist" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/QRPfRA_right_wrist_m.stl"/>
+        <mesh name="main_body" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_body_m.stl"/>
+        <mesh name="Left_Hind_Limb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_left_hindlimb_m.stl"/>
+        <mesh name="Left_MidLimb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_left_midlimb_m.stl"/>
+        <mesh name="Left_Wrist" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_left_wrist_m.stl"/>
+        <mesh name="Right_Hind_Limb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_right_hindlimb_m.stl"/>
+        <mesh name="Right_MidLimb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_right_midlimb_m.stl"/>
+        <mesh name="Right_Wrist" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_right_wrist_m.stl"/>
     </asset>
 
     <worldbody>
         <camera name="track" mode="trackcom" pos="0 -1 0.3" xyaxes="1 0 0 0 0 1"/>
 
-        <body name="base_link" pos="0 0 0.5">
+        <body name="base_link" pos="0 0 0.15">
             <geom type="mesh" mesh="main_body" mass="2" friction="0.3" contype="1" conaffinity="1" density="1240" />
             <joint limited="false" margin="0.01" name="root" pos="0 0 0" type="free" stiffness="0" damping="0" frictionloss="0" armature="0"/>
 
@@ -137,7 +137,12 @@
         <exclude body1="base_link" body2="rear_Left_MidLimb"/>
         <exclude body1="base_link" body2="front_Right_MidLimb"/>
         <exclude body1="base_link" body2="rear_Right_MidLimb"/>
-    </contact>
+
+        <exclude body1="base_link" body2="front_Left_Wrist"/>
+        <exclude body1="base_link" body2="rear_Left_Wrist"/>
+        <exclude body1="base_link" body2="front_Right_Wrist"/>
+        <exclude body1="base_link" body2="rear_Right_Wrist"/>
+        </contact>
 
     <actuator>
         <position class="servo_motors" joint="FL_hind_to_base" name="FL_Hind2Base"/>
@@ -162,26 +167,31 @@
         <gyro name="gyroscope" site="base_link_Site"/> <!-- 3 4 5 -->
         <magnetometer name="magnetometer" site="base_link_Site"/> <!-- 6 7 8 -->
 
-        <framequat name="abs_orientation_of_the_base" objtype="site" objname="base_link_Site"/> <!-- 9 10 11 12 -->
+        <!--framequat name="abs_orientation_of_the_base" reftype="body" refname="base_link" objtype="site" objname="base_link_Site"/--> <!-- 9 10 11 12 -->
 
-        <jointpos name="FL_Hind2Base_angle" joint="FL_hind_to_base"/> <!-- 13 -->
-        <jointpos name="FL_Mid2Hind_angle" joint="FL_mid_to_base"/> <!-- 14 -->
-        <jointpos name="FL_Wrist2Mid_angle" joint="FL_wrist_to_mid"/> <!-- 15 -->
+        <jointpos name="FL_Hind2Base_angle" joint="FL_hind_to_base"/> <!-- 9 -->
+        <jointpos name="FL_Mid2Hind_angle" joint="FL_mid_to_base"/> <!-- 10 -->
+        <jointpos name="FL_Wrist2Mid_angle" joint="FL_wrist_to_mid"/> <!-- 11 -->
 
-        <jointpos name="RL_Hind2Base_angle" joint="RL_hind_to_base"/> <!-- 16 -->
-        <jointpos name="RL_Mid2Hind_angle" joint="RL_mid_to_base"/> <!-- 17 -->
-        <jointpos name="RL_Wrist2Mid_angle" joint="RL_wrist_to_mid"/> <!-- 18 -->
+        <jointpos name="RL_Hind2Base_angle" joint="RL_hind_to_base"/> <!-- 12 -->
+        <jointpos name="RL_Mid2Hind_angle" joint="RL_mid_to_base"/> <!-- 13 -->
+        <jointpos name="RL_Wrist2Mid_angle" joint="RL_wrist_to_mid"/> <!-- 14 -->
 
-        <jointpos name="FR_Hind2Base_angle" joint="FR_hind_to_base"/> <!-- 19 -->
-        <jointpos name="FR_Mid2Hind_angle" joint="FR_mid_to_base"/> <!-- 20 -->
-        <jointpos name="FR_Wrist2Mid_angle" joint="FR_wrist_to_mid"/> <!-- 21 -->
+        <jointpos name="FR_Hind2Base_angle" joint="FR_hind_to_base"/> <!-- 15 -->
+        <jointpos name="FR_Mid2Hind_angle" joint="FR_mid_to_base"/> <!-- 16 -->
+        <jointpos name="FR_Wrist2Mid_angle" joint="FR_wrist_to_mid"/> <!-- 17 -->
 
-        <jointpos name="RR_Hind2Base_angle" joint="RR_hind_to_base"/> <!-- 22 -->
-        <jointpos name="RR_Mid2Hind_angle" joint="RR_mid_to_base"/> <!-- 23 -->
-        <jointpos name="RR_Wrist2Mid_angle" joint="RR_wrist_to_mid"/> <!-- 24 -->
+        <jointpos name="RR_Hind2Base_angle" joint="RR_hind_to_base"/> <!-- 18 -->
+        <jointpos name="RR_Mid2Hind_angle" joint="RR_mid_to_base"/> <!-- 19 -->
+        <jointpos name="RR_Wrist2Mid_angle" joint="RR_wrist_to_mid"/> <!-- 20 -->
 
-        <rangefinder name="head_rangefinder" site="head_rangefinder"/> <!-- 25 -->
-        <rangefinder name="rear_rangefinder" site="rear_rangefinder"/> <!-- 26 -->
+        <rangefinder name="head_rangefinder" site="head_rangefinder"/> <!-- 21 -->
+        <rangefinder name="rear_rangefinder" site="rear_rangefinder"/> <!-- 22 -->
+
+        <touch name="FL_foot_touch" site="front_Left_Wrist_Site"/> <!-- 23 -->
+        <touch name="RL_foot_touch" site="rear_Left_Wrist_Site"/> <!-- 24 -->
+        <touch name="FR_foot_touch" site="front_Right_Wrist_Site"/> <!-- 25 -->
+        <touch name="RR_foot_touch" site="rear_Right_Wrist_Site"/> <!-- 26 -->
     </sensor>
 
 </mujoco>

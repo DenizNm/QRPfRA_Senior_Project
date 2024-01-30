@@ -25,13 +25,13 @@
     </default>
 
     <asset>
-        <mesh name="main_body" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/QRPfRA_body_m.stl"/>
-        <mesh name="Left_Hind_Limb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/QRPfRA_left_hindlimb_m.stl"/>
-        <mesh name="Left_MidLimb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/QRPfRA_left_midlimb_m.stl"/>
-        <mesh name="Left_Wrist" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/QRPfRA_left_wrist_m.stl"/>
-        <mesh name="Right_Hind_Limb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/QRPfRA_right_hindlimb_m.stl"/>
-        <mesh name="Right_MidLimb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/QRPfRA_right_midlimb_m.stl"/>
-        <mesh name="Right_Wrist" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/QRPfRA_right_wrist_m.stl"/>
+        <mesh name="main_body" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_body_m.stl"/>
+        <mesh name="Left_Hind_Limb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_left_hindlimb_m.stl"/>
+        <mesh name="Left_MidLimb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_left_midlimb_m.stl"/>
+        <mesh name="Left_Wrist" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_left_wrist_m.stl"/>
+        <mesh name="Right_Hind_Limb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_right_hindlimb_m.stl"/>
+        <mesh name="Right_MidLimb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_right_midlimb_m.stl"/>
+        <mesh name="Right_Wrist" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_right_wrist_m.stl"/>
     </asset>
 
     <worldbody>
@@ -157,7 +157,6 @@
         <jointpos name="FR_Hind2Base_angle" joint="FR_hind_to_base"/>
         <jointpos name="FR_Mid2Hind_angle" joint="FR_mid_to_base"/>
         <jointpos name="FR_Wrist2Mid_angle" joint="FR_wrist_to_mid"/>
-
 
         <!--framepos name="Left_Foot_pos" reftype="site" refname="FL_Leg_ref" objtype="site" objname="front_Left_Wrist_Site"/>
         <jointpos name="FL_Hind2Base_angle" joint="FL_hind_to_base"/>
