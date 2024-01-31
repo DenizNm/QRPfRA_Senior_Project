@@ -83,17 +83,17 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         done = False
 
         if observation[2] < -8:
-            reward -= 200
+            reward -= 500
 
         self.step_count += 1
-        if self.step_count > 20000:
+        if self.step_count > 4000:
             done = True
 
         #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE
         #observation = observation/1000
         #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE
 
-        return observation, reward, done, info # done, false, info
+        return observation, reward, done, False, info # done, false, info
 
     def _get_obs(self):
         sensor_data = self.data.sensordata.flat.copy()

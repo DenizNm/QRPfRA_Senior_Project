@@ -8,12 +8,12 @@ with open('/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/r
     f.write(right_leg_tflite_model)
 
 
-"""converter = tf.lite.TFLiteConverter.from_saved_model("/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/left_legs_model")
+converter = tf.lite.TFLiteConverter.from_saved_model("/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/left_legs_model")
 converter.optimizations = [tf.lite.Optimize.DEFAULT]
 left_leg_tflite_model = converter.convert()
 with open('/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/right_leg_model_quantized.tflite', 'wb') as f:
     f.write(left_leg_tflite_model)
-"""
+
 
 
 

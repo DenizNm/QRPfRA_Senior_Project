@@ -45,11 +45,11 @@ def quat_2_euler(quat):
 
 
 def init_position():
-    front_left_leg = np.array([-0.04, 0, -0.12])
-    front_right_leg = np.array([0.04, 0, -0.12])
+    front_left_leg = np.array([-0.06, 0, -0.12])
+    back_left_leg = np.array([-0.06, 0, -0.12])
 
-    back_left_leg = np.array([-0.04, 0, -0.12])
-    back_right_leg = np.array([0.04, 0, -0.12])
+    front_right_leg = np.array([-0.04, 0, -0.12])
+    back_right_leg = np.array([-0.04, 0, -0.12])
     return np.concatenate((front_left_leg, back_left_leg, front_right_leg, back_right_leg))
 
 def init_position2():
@@ -97,11 +97,10 @@ while True:
         action[10] = action[10] - y[step % count]
         action[11] = action[11] + z[step % count]
 
-    obs, reward, done, info = env.step(action)
+    print("Action: ", action)
+    obs, reward, done, _, info = env.step(action)
 
     foot_observation = obs[-4:]
-    print("Foot observation: ", foot_observation)
-
 
     prev_action = action
     if done:
