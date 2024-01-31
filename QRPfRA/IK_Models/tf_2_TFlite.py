@@ -1,19 +1,19 @@
 import tensorflow as tf
 
 # Convert the TensorFlow models to TFLite models and quantize them
-"""converter = tf.lite.TFLiteConverter.from_saved_model("/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/right_legs_model")
+converter = tf.lite.TFLiteConverter.from_saved_model("/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/right_legs_model")
 converter.optimizations = [tf.lite.Optimize.DEFAULT]
 right_leg_tflite_model = converter.convert()
-with open('right_leg_model_quantized.tflite', 'wb') as f:
+with open('/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/right_leg_model_quantized.tflite', 'wb') as f:
     f.write(right_leg_tflite_model)
-"""
 
-converter = tf.lite.TFLiteConverter.from_saved_model("/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/left_legs_model")
+
+"""converter = tf.lite.TFLiteConverter.from_saved_model("/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/left_legs_model")
 converter.optimizations = [tf.lite.Optimize.DEFAULT]
 left_leg_tflite_model = converter.convert()
-with open('left_leg_model_quantized.tflite', 'wb') as f:
+with open('/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/right_leg_model_quantized.tflite', 'wb') as f:
     f.write(left_leg_tflite_model)
-
+"""
 
 
 

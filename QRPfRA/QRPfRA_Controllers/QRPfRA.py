@@ -97,7 +97,7 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
 
     def _get_obs(self):
         sensor_data = self.data.sensordata.flat.copy()
-        sensor_data[23:27] = [1 if i > 0 else 0 for i in sensor_data[23:27]]
+        sensor_data[23:27] = [1 if i > 0.0 else 0.0 for i in sensor_data[23:27]]
 
         return sensor_data
 
