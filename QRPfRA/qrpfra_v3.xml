@@ -15,11 +15,11 @@
         </default>
 
         <default class="Left_foot_Site">
-            <site pos="-0.015 0.12 0" type="sphere" size="0.022"/>
+            <site pos="-0.016 0.13 -0.005" type="sphere" size="0.01"/>
         </default>
 
         <default class="Right_foot_Site">
-            <site pos="0.015 0.12 0" type="sphere" size="0.022"/>
+            <site pos="0.016 0.13 -0.005" type="sphere" size="0.01"/>
         </default>
 
     </default>
@@ -46,10 +46,10 @@
             <site name="head_rangefinder" pos="0 0.14 0" type="box" size="0.01 0.005 0.001" euler="-90 0 0"/>
             <site name="rear_rangefinder" pos="0 -0.155 0" type="box" size="0.01 0.005 0.001" euler="90 0 0"/>
 
-            <site name="FL_Leg_ref" pos="-0.04 0.0875 0.0025"/>
-            <site name="RL_Leg_ref" pos="-0.04 -0.0975 0.0025"/>
-            <site name="FR_Leg_ref" pos="0.04 0.0875 0.0025"/>
-            <site name="RR_Leg_ref" pos="0.04 -0.0975 0.0025"/>
+            <site name="FL_Leg_ref" pos="-0.04 0.0875 0.015"/>
+            <site name="RL_Leg_ref" pos="-0.04 -0.0975 0.015"/>
+            <site name="FR_Leg_ref" pos="0.04 0.0875 0.015"/>
+            <site name="RR_Leg_ref" pos="0.04 -0.0975 0.015"/>I am trying to make a
 
             <body name="front_Left_Hind_Limb" pos="-0.04 0.065 0.013">
                 <joint class="joint_def" axis="0 1 0" name="FL_hind_to_base" />

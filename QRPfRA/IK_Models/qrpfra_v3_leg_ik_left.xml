@@ -1,5 +1,5 @@
 <mujoco model="qrpfra_v3_ik_model">
-    <compiler angle="degree" coordinate="local" inertiafromgeom="true" convexhull="true"/>
+    <compiler angle="degree" coordinate="local"/>
     <option integrator="RK4" timestep="0.01" gravity="0 0 -9.81" density="1.24"/>
 
     <default>
@@ -15,11 +15,11 @@
         </default>
 
         <default class="Left_foot_Site">
-            <site pos="-0.015 0.12 0" type="sphere" size="0.002"/>
+            <site pos="-0.016 0.13 -0.005" type="sphere" size="0.01"/>
         </default>
 
         <default class="Right_foot_Site">
-            <site pos="0.015 0.12 0" type="sphere" size="0.002"/>
+            <site pos="0.016 0.13 -0.005" type="sphere" size="0.01"/>
         </default>
 
     </default>
@@ -38,7 +38,7 @@
         <body name="base_link" pos="0 0 0.5">
             <camera name="track" mode="trackcom" pos="0 -1 0.3" xyaxes="1 0 0 0 0 1"/>
 
-            <geom type="mesh" mesh="main_body" mass="2" friction="0.3" density="1240" />
+            <geom type="mesh" mesh="main_body" mass="2" friction="0.3" density="2400" />
             <!--joint limited="true" margin="0.01" name="root" pos="0 0 0" type="free" stiffness="0" damping="0" frictionloss="0" armature="0"/-->
 
             <site name="base_link_Site" pos="0 0 0" type="box" size="0.03 0.05 0.01"/>
@@ -46,22 +46,22 @@
             <site name="head_rangefinder" pos="0 0.14 0" type="box" size="0.01 0.005 0.001" euler="-90 0 0"/>
             <site name="rear_rangefinder" pos="0 -0.155 0" type="box" size="0.01 0.005 0.001" euler="90 0 0"/>
 
-            <site name="FL_Leg_ref" pos="-0.04 0.0875 0.0025"/>
-            <site name="RL_Leg_ref" pos="-0.04 -0.0975 0.0025"/>
-            <site name="FR_Leg_ref" pos="0.04 0.0875 0.0025"/>
-            <site name="RR_Leg_ref" pos="0.04 -0.0975 0.0025"/>
+            <site name="FL_Leg_ref" pos="-0.04 0.0875 0.015"/>
+            <site name="RL_Leg_ref" pos="-0.04 -0.0975 0.015"/>
+            <site name="FR_Leg_ref" pos="0.04 0.0875 0.015"/>
+            <site name="RR_Leg_ref" pos="0.04 -0.0975 0.015"/>
 
             <body name="front_Left_Hind_Limb" pos="-0.04 0.065 0.013">
                 <joint class="joint_def" axis="0 1 0" name="FL_hind_to_base"/>
-                <geom type="mesh" mesh="Left_Hind_Limb" mass="0.150" density="1240"/>
+                <geom type="mesh" mesh="Left_Hind_Limb" mass="0.150" density="2400"/>
 
                 <body name="front_Left_MidLimb" pos="-0.025 0.023 -0.0105" euler="90 0 0">
                     <joint class="joint_def" axis="1 0 0" name="FL_mid_to_base"/>
-                    <geom type="mesh" mesh="Left_MidLimb" mass="0.350" density="1240"/>
+                    <geom type="mesh" mesh="Left_MidLimb" mass="0.350" density="2400"/>
 
                     <body name="front_Left_Wrist" pos="-0.005 -0.107 -0.013" euler="-90 0 0">
                         <joint class="joint_def" axis="1 0 0" name="FL_wrist_to_mid" />
-                        <geom type="mesh" mesh="Left_Wrist" mass="0.350" density="1240"/>
+                        <geom type="mesh" mesh="Left_Wrist" mass="0.350" density="2400"/>
 
                         <site name="front_Left_Wrist_Site" class="Left_foot_Site"/>
 
@@ -71,15 +71,15 @@
 
             <!--body name="rear_Left_Hind_Limb" pos="-0.04 -0.12 0.013">
                 <joint class="joint_def" axis="0 1 0" name="RL_hind_to_base" />
-                <geom type="mesh" mesh="Left_Hind_Limb" mass="0.150" contype="1" conaffinity="1" density="1240"/>
+                <geom type="mesh" mesh="Left_Hind_Limb" mass="0.150" contype="1" conaffinity="1" density="2400"/>
 
                 <body name="rear_Left_MidLimb" pos="-0.025 0.023 -0.0105" euler="90 0 0">
                     <joint class="joint_def" axis="1 0 0" name="RL_mid_to_base" />
-                    <geom type="mesh" mesh="Left_MidLimb" mass="0.350" contype="1" conaffinity="1" density="1240"/>
+                    <geom type="mesh" mesh="Left_MidLimb" mass="0.350" contype="1" conaffinity="1" density="2400"/>
 
                     <body name="rear_Left_Wrist" pos="-0.005 -0.107 -0.013" euler="-90 0 0">
                         <joint class="joint_def" axis="1 0 0" name="RL_wrist_to_mid" />
-                        <geom type="mesh" mesh="Left_Wrist" mass="0.350" contype="1" conaffinity="1" density="1240"/>
+                        <geom type="mesh" mesh="Left_Wrist" mass="0.350" contype="1" conaffinity="1" density="2400"/>
 
                         <site name="rear_Left_Wrist_Site" class="Left_foot_Site"/>
 
@@ -89,15 +89,15 @@
 
             <body name="front_Right_Hind_Limb" pos="0.04 0.065 0.013">
                 <joint class="joint_def" axis="0 1 0" name="FR_hind_to_base" />
-                <geom type="mesh" mesh="Right_Hind_Limb" mass="0.150" contype="1" conaffinity="1" density="1240"/>
+                <geom type="mesh" mesh="Right_Hind_Limb" mass="0.150" contype="1" conaffinity="1" density="2400"/>
 
                 <body name="front_Right_MidLimb" pos="0.025 0.023 -0.0105" euler="90 0 0">
                     <joint class="joint_def" axis="1 0 0" name="FR_mid_to_base"  />
-                    <geom type="mesh" mesh="Right_MidLimb" mass="0.350" contype="1" conaffinity="1" density="1240"/>
+                    <geom type="mesh" mesh="Right_MidLimb" mass="0.350" contype="1" conaffinity="1" density="2400"/>
 
                     <body name="front_Right_Wrist" pos="0.005 -0.107 -0.013" euler="-90 0 0">
                         <joint class="joint_def" axis="1 0 0" name="FR_wrist_to_mid" />
-                        <geom type="mesh" mesh="Right_Wrist" mass="0.350" contype="1" conaffinity="1" density="1240"/>
+                        <geom type="mesh" mesh="Right_Wrist" mass="0.350" contype="1" conaffinity="1" density="2400"/>
 
                         <site name="front_Right_Wrist_Site" class="Right_foot_Site"/>
 
@@ -107,15 +107,15 @@
 
             <body name="rear_Right_Hind_Limb" pos="0.04 -0.12 0.013">
                 <joint class="joint_def" axis="0 1 0" name="RR_hind_to_base" />
-                <geom type="mesh" mesh="Right_Hind_Limb" mass="0.150" contype="1" conaffinity="1" density="1240"/>
+                <geom type="mesh" mesh="Right_Hind_Limb" mass="0.150" contype="1" conaffinity="1" density="2400"/>
 
                 <body name="rear_Right_MidLimb" pos="0.025 0.023 -0.0105" euler="90 0 0">
                     <joint class="joint_def" axis="1 0 0" name="RR_mid_to_base"  />
-                    <geom type="mesh" mesh="Right_MidLimb" mass="0.350" contype="1" conaffinity="1" density="1240"/>
+                    <geom type="mesh" mesh="Right_MidLimb" mass="0.350" contype="1" conaffinity="1" density="2400"/>
 
                     <body name="rear_Right_Wrist" pos="0.005 -0.107 -0.013" euler="-90 0 0">
                         <joint class="joint_def" axis="1 0 0" name="RR_wrist_to_mid" />
-                        <geom type="mesh" mesh="Right_Wrist" mass="0.350" contype="1" conaffinity="1" density="1240"/>
+                        <geom type="mesh" mesh="Right_Wrist" mass="0.350" contype="1" conaffinity="1" density="2400"/>
 
                         <site name="rear_Right_Wrist_Site" class="Right_foot_Site"/>
 

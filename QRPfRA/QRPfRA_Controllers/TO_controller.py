@@ -45,19 +45,19 @@ def quat_2_euler(quat):
 
 
 def init_position():
-    front_left_leg = np.array([-0.06, 0, -0.12])
-    back_left_leg = np.array([-0.06, 0, -0.12])
+    front_left_leg = np.array([-0.045, 0, -0.10])
+    back_left_leg = np.array([-0.045, 0, -0.10])
 
-    front_right_leg = np.array([-0.04, 0, -0.12])
-    back_right_leg = np.array([-0.04, 0, -0.12])
+    front_right_leg = np.array([-0.045, 0, -0.10])
+    back_right_leg = np.array([-0.045, 0, -0.10])
     return np.concatenate((front_left_leg, back_left_leg, front_right_leg, back_right_leg))
 
 def init_position2():
-    front_left_leg = np.array([-0.08, -0.02, -0.13])
-    front_right_leg = np.array([0.08, -0.02, -0.13])
+    front_left_leg = np.array([-0.045, 0, -0.19])
+    back_left_leg = np.array([-0.045, 0, -0.19])
 
-    back_left_leg = np.array([-0.08, -0.02, -0.13])
-    back_right_leg = np.array([0.08, -0.02, -0.13])
+    front_right_leg = np.array([-0.045, 0, -0.19])
+    back_right_leg = np.array([-0.045, 0, -0.19])
     return np.concatenate((front_left_leg, back_left_leg, front_right_leg, back_right_leg))
 
 
@@ -67,44 +67,46 @@ def draw_elipse(a, b, count):
     return x, y
 
 
-a = 0.025
+a = 0.06
 b = 0.06
-count = 50
+count = 100
 z, y = draw_elipse(a, b, count)
 
 
 step = 0
-prev_action = np.zeros(num_actions)
-foot_observation = np.zeros(4)
 while True:
-    if step < 10000:
+    if step % 200 < 100:
         action = init_position()
     else:
         action = init_position2()
+
+    """if step < 100:
+        action = init_position()
+    else:
+        action = init_position2()
+        index = step % count
+        if index == 0:
+            index = count - step % count - 1
+
         # FL
-        action[1] = action[1] - y[step % count]
-        action[2] = action[2] + z[step % count]
+        action[1] = action[1] + y[index]
+        action[2] = action[2] - z[index]
 
         # RL
-        action[4] = action[4] + y[step % count]
-        action[5] = action[5] - z[step % count]
+        action[4] = action[4] - y[index]
+        action[5] = action[5] + z[index]
 
         # FR
-        action[7] = action[7] + y[step % count]
-        action[8] = action[8] - z[step % count]
+        action[7] = action[7] - y[index]
+        action[8] = action[8] + z[index]
 
         # RR
-        action[10] = action[10] - y[step % count]
-        action[11] = action[11] + z[step % count]
+        action[10] = action[10] + y[index]
+        action[11] = action[11] - z[index]"""
 
-    print("Action: ", action)
     obs, reward, done, _, info = env.step(action)
 
-    foot_observation = obs[-4:]
-
-    prev_action = action
     if done:
-        print("Episode finished after {} timesteps".format(i + 1))
         env.reset()
 
     step += 1

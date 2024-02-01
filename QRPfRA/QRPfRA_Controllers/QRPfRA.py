@@ -85,6 +85,7 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         if observation[2] < -8:
             reward -= 500
 
+        #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE
         self.step_count += 1
         if self.step_count > 4000:
             done = True
