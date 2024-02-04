@@ -1,18 +1,22 @@
 import numpy as np
-
 from gymnasium import utils
 from gymnasium.envs.mujoco import MujocoEnv
 from gymnasium.error import Error
 from gymnasium.spaces import Box
 from gymnasium.utils.env_checker import check_env
-
 import tensorflow as tf
 
-right_leg_interpreter = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/right_leg_model_quantized.tflite')
+"""right_leg_interpreter = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/right_leg_model_quantized.tflite')
 right_leg_interpreter.allocate_tensors()
 
 left_leg_interpreter = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/left_leg_model_quantized.tflite')
 left_leg_interpreter.allocate_tensors()
+
+fine_tuned_leg_interpreter = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/fine_tuned_leg_model_quantized.tflite')
+fine_tuned_leg_interpreter.allocate_tensors()"""
+
+fine_tuned_leg_interpreter_v2 = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/fine_tuned_leg_model_quantized.tflite')
+fine_tuned_leg_interpreter_v2.allocate_tensors()
 
 
 class QRPfRA_v3(MujocoEnv, utils.EzPickle):
@@ -53,19 +57,21 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         self.observation_space = Box(
             low=-np.inf, high=np.inf, shape=(obs_size,), dtype=np.float64
         )
-        self.left_leg_model = left_leg_interpreter
+        """self.left_leg_model = left_leg_interpreter
         self.right_leg_model = right_leg_interpreter
+        self.fine_tuned_leg_model = fine_tuned_leg_interpreter"""
+        self.fine_tuned_leg_model_v2 = fine_tuned_leg_interpreter_v2
 
 
     def step(self, action):
         #Uncomment to run inference for TFlite inverse kinematics models
-        action = np.clip(action, self.action_space.low, self.action_space.high).tolist()
+        action = action.tolist()
 
-        FL = self._run_inference(self.left_leg_model, action[0:3])
-        RL = self._run_inference(self.left_leg_model, action[3:6])
+        FL = self._run_inference(self.fine_tuned_leg_model_v2, action[0:3])
+        RL = self._run_inference(self.fine_tuned_leg_model_v2, action[3:6])
 
-        FR = self._run_inference(self.right_leg_model, action[6:9])
-        RR = self._run_inference(self.right_leg_model, action[9:12])
+        FR = self._run_inference(self.fine_tuned_leg_model_v2, action[6:9])
+        RR = self._run_inference(self.fine_tuned_leg_model_v2, action[9:12])
 
         action = np.array([FL, RL, FR, RR]).flatten()
 
@@ -128,6 +134,11 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
     def _compute_reward(self, observation, action):
         # Get absolute position of the base
         baselink_pos = self.get_body_com("base_link")
+        FL_hind_limb = observation[9]
+        RL_hind_limb = observation[12]
+        FR_hind_limb = observation[15]
+        RR_hind_limb = observation[18]
+
         x, y, z = tuple(baselink_pos)
         if y >= 0:
             reward = (y*20+2) ** 2 - abs(x) * 10
