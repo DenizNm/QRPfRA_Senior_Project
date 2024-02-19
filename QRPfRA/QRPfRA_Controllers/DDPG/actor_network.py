@@ -16,11 +16,11 @@ def get_actor(input_shape, num_actions):
     out1 = layers.Flatten()(out1)
 
     # Add dense layers for out1
-    out1 = layers.Dense(64, activation="relu")(out1)
-    #out1 = layers.Dense(256, activation="relu")(out1)
+    out1 = layers.Dense(64, activation="relu", activity_regularizer=tf.keras.regularizers.L2(0.01))(out1)
+    out1 = layers.Dense(256, activation="relu", activity_regularizer=tf.keras.regularizers.L2(0.01))(out1)
     out1 = layers.BatchNormalization()(out1)
-    out1 = layers.Dense(128, activation="relu")(out1)
-    out1 = layers.Dense(32, activation="relu")(out1)
+    out1 = layers.Dense(128, activation="relu", activity_regularizer=tf.keras.regularizers.L2(0.01))(out1)
+    out1 = layers.Dense(32, activation="linear", activity_regularizer=tf.keras.regularizers.L2(0.01))(out1)
 
     # Define the output layer with the custom initializer
     outputs = layers.Dense(num_actions, activation="tanh", kernel_initializer=last_init)(out1)

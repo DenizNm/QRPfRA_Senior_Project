@@ -10,8 +10,8 @@ import tensorflow as tf
 
 
 
-right_leg_interpreter = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/right_leg_model_quantized.tflite')
-right_leg_interpreter.allocate_tensors()
+leg_interpreter = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/fine_tuned_leg_model_quantized_v2.tflite')
+leg_interpreter.allocate_tensors()
 
 class QRPfRA_v3(MujocoEnv, utils.EzPickle):
     metadata = {
@@ -49,7 +49,7 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
             low=-np.inf, high=np.inf, shape=(obs_size,), dtype=np.float64
         )
 
-        self.right_leg_model = right_leg_interpreter
+        self.right_leg_model = leg_interpreter
 
     def step(self, action):
         print("Position of the foothold", action)
@@ -110,13 +110,12 @@ obs = env.reset()
 env.render_mode = "human"
 
 for i in range(10000000):
-    for i in range(-17, -9):
+    for i in range(-220, -120):
 
+        obs, reward, done, _, info = env.step([float(m) for m in [-0.025, 0.0, i/1000]])
+    for i in range(-120, -220, -1):
         #action = env.action_space.sample()
-        obs, reward, done, _, info = env.step([float(m) for m in [0.12, 0, i/100]])
-    for i in range(-9, -17, -1):
-        #action = env.action_space.sample()
-        obs, reward, done, _, info = env.step([float(m) for m in [0.12, 0, i/100]])
+        obs, reward, done, _, info = env.step([float(m) for m in [-0.025, 0.0, i/1000]])
 
 
 env.close()

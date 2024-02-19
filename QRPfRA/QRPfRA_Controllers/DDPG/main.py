@@ -131,7 +131,7 @@ for ep in range(total_episodes):
         action = np.array(policy(tf_prev_state, ou_noise)).flatten()
 
         # Recieve state and reward from environment.
-        state, reward, done, info = env.step(action)
+        state, reward, done, _, info = env.step(action)
         print("Reward: ", reward)
 
         buffer.record((prev_state, action, reward, state))

@@ -34,19 +34,19 @@ class Policy_Network(nn.Module):
         # Shared Network
         self.shared_net = nn.Sequential(
             nn.Linear(obs_space_dims, 512),
-            nn.Tanh(),
+            nn.LeakyReLU(),
             nn.Linear(512, 512),
-            nn.Tanh(),
+            nn.LeakyReLU(),
             nn.Linear(512, 1024),
-            nn.Tanh(),
+            nn.LeakyReLU(),
             nn.Linear(1024, 512),
-            nn.Tanh(),
+            nn.LeakyReLU(),
             nn.Linear(512, 512),
-            nn.Tanh(),
+            nn.LeakyReLU(),
             nn.Linear(512, 1024),
-            nn.Tanh(),
+            nn.LeakyReLU(),
             nn.Linear(1024, 128),
-            nn.Tanh(),
+            nn.LeakyReLU(),
             nn.Linear(128, hidden_space2),
             nn.Tanh(),
         )
@@ -170,6 +170,35 @@ obs_space_dims = env.observation_space.shape[0]
 action_space_dims = env.action_space.shape[0]
 rewards_over_seeds = []
 
+
+def init_position():
+    front_left_leg = np.array([-0.025, -0.08, -0.12])
+    back_left_leg = np.array([-0.025, -0.09, -0.125])
+
+    front_right_leg = np.array([-0.025, -0.08, -0.12])
+    back_right_leg = np.array([-0.025, -0.09, -0.125])
+    return np.concatenate((front_left_leg, back_left_leg, front_right_leg, back_right_leg))
+
+def init_position2():
+    front_left_leg = np.array([-0.06, 0.0, -0.18])
+    back_left_leg = np.array([-0.06, 0.0, -0.18])
+
+    front_right_leg = np.array([0.015, 0.0, -0.18])
+    back_right_leg = np.array([0.015, 0.0, -0.18])
+    return np.concatenate((front_left_leg, back_left_leg, front_right_leg, back_right_leg))
+
+
+def draw_elipse(a, b, count):
+    x = np.linspace(-a, a, count)
+    y = b * np.sqrt(1 - (x ** 2 / a ** 2))
+    return x, y
+
+
+a = 0.02
+b = 0.07
+count = 50
+z, y = draw_elipse(a, b, count)
+
 for seed in [1, 2, 3, 5, 8]:  # Fibonacci seeds
     # set seed
     torch.manual_seed(seed)
@@ -185,8 +214,35 @@ for seed in [1, 2, 3, 5, 8]:  # Fibonacci seeds
         obs, info = wrapped_env.reset(seed=seed)
 
         done = False
+        step = 0
         while not done:
-            action = agent.sample_action(obs)
+            sampled_action = agent.sample_action(obs)
+
+
+            action = init_position2()
+            index = step % count
+            if index == 0:
+                index = count - step % count - 1
+
+            # FL
+            action[1] = action[1] - y[index]
+            action[2] = action[2] - z[index]
+
+            # RL
+            action[4] = action[4] + y[index]
+            action[5] = action[5] + z[index] - 0.02
+
+            # FR
+            action[7] = action[7] + y[index]
+            action[8] = action[8] + z[index]
+
+            # RR
+            action[10] = action[10] - y[index]
+            action[11] = action[11] - z[index] - 0.02
+
+
+            #sum the action with sampled action
+            action = action + sampled_action
 
             # Step return type - `tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]`
             # These represent the next observation, the reward from the step,
@@ -200,6 +256,7 @@ for seed in [1, 2, 3, 5, 8]:  # Fibonacci seeds
             #  - terminated: Any of the state space values is no longer finite.
             done = terminated or truncated
             agent.update()
+            step += 1
 
         reward_over_episodes.append(wrapped_env.return_queue[-1])
 

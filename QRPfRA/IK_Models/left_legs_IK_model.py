@@ -13,6 +13,11 @@ from gymnasium.utils.env_checker import check_env
 import tensorflow as tf
 from tensorflow import keras
 
+
+leg_interpreter = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/fine_tuned_leg_model_quantized_v2.tflite')
+leg_interpreter.allocate_tensors()
+
+
 class QRPfRA_v3(MujocoEnv, utils.EzPickle):
     metadata = {
         "render_modes": [
@@ -22,7 +27,7 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         ],
     }
 
-    def __init__(self, xml_file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/IK_Models/qrpfra_v3_leg_ik_scene_left.xml", frame_skip=1, **kwargs):
+    def __init__(self, xml_file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/qrpfra_v3_leg_ik_scene_left.xml", frame_skip=1, **kwargs):
         utils.EzPickle.__init__(self, xml_file, frame_skip, **kwargs)
 
         MujocoEnv.__init__(
@@ -48,13 +53,13 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         self.observation_space = Box(
             low=-np.inf, high=np.inf, shape=(obs_size,), dtype=np.float64
         )
-        self.left_leg_model = tf.keras.models.load_model("/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA_sim_body_STLs/IK_Models/left_legs_model")
+        self.left_leg_model = leg_interpreter
 
     def step(self, action):
         print("Position of the foothold", action)
         #x_position_before = self.data.qpos[0]
         action = np.array(action).reshape(1, 3)
-        action = self.left_leg_model.predict(action)[0]*100
+        action = self._run_inference(self.left_leg_model, action)[0]*100
 
         print("Angle action", action)
 
@@ -90,6 +95,18 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         return {"works": True}
 
 
+    def _run_inference(self, model, input_data):
+        input_details = model.get_input_details()
+        output_details = model.get_output_details()
+
+        input_data = np.array(input_data, dtype=np.float32)
+
+        model.set_tensor(input_details[0]['index'], input_data)
+        model.invoke()
+        output_data = model.get_tensor(output_details[0]['index'])
+        return output_data
+
+
 
 env = QRPfRA_v3()
 check_env(env)
@@ -97,13 +114,11 @@ obs = env.reset()
 env.render_mode = "human"
 
 for i in range(10000000):
-    for i in range(-19, -9):
+    for i in range(-220, -120):
 
+        obs, reward, done, _, info = env.step([float(m) for m in [-0.025, 0.0, i/1000]])
+    for i in range(-120, -220, -1):
         #action = env.action_space.sample()
-        obs, reward, done, _, info = env.step([float(m) for m in [-0.04, i/100, i/100]])
-    for i in range(-9, -19, -1):
-        #action = env.action_space.sample()
-        obs, reward, done, _, info = env.step([float(m) for m in [-0.04, i/100, i/100]])
-
+        obs, reward, done, _, info = env.step([float(m) for m in [-0.025, 0.0, i/1000]])
 
 env.close()

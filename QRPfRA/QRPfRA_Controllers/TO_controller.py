@@ -2,7 +2,7 @@ import numpy as np
 from gymnasium.utils.env_checker import check_env
 import QRPfRA
 
-env = QRPfRA.QRPfRA_v3()
+env = QRPfRA.QRPfRA_v3(use_serial_port=False)
 check_env(env)
 obs = env.reset()
 env.render_mode = "human"
@@ -45,19 +45,27 @@ def quat_2_euler(quat):
 
 
 def init_position():
-    front_left_leg = np.array([-0.045, 0, -0.10])
-    back_left_leg = np.array([-0.045, 0, -0.10])
+    front_left_leg = np.array([-0.025, -0.08, -0.12])
+    back_left_leg = np.array([-0.025, -0.09, -0.125])
 
-    front_right_leg = np.array([-0.045, 0, -0.10])
-    back_right_leg = np.array([-0.045, 0, -0.10])
+    front_right_leg = np.array([-0.025, -0.08, -0.12])
+    back_right_leg = np.array([-0.025, -0.09, -0.125])
     return np.concatenate((front_left_leg, back_left_leg, front_right_leg, back_right_leg))
 
 def init_position2():
-    front_left_leg = np.array([-0.045, 0, -0.19])
-    back_left_leg = np.array([-0.045, 0, -0.19])
+    front_left_leg = np.array([-0.06, 0.0, -0.18])
+    back_left_leg = np.array([-0.06, 0.0, -0.18])
 
-    front_right_leg = np.array([-0.045, 0, -0.19])
-    back_right_leg = np.array([-0.045, 0, -0.19])
+    front_right_leg = np.array([0.015, 0.0, -0.18])
+    back_right_leg = np.array([0.015, 0.0, -0.18])
+    return np.concatenate((front_left_leg, back_left_leg, front_right_leg, back_right_leg))
+
+def init_position3():
+    front_left_leg = np.array([-0.09, 0.19, -0.19])
+    back_left_leg = np.array([-0.09, -0.19, -0.19])
+
+    front_right_leg = np.array([0.045, 0.19, -0.19])
+    back_right_leg = np.array([0.045, -0.19, -0.19])
     return np.concatenate((front_left_leg, back_left_leg, front_right_leg, back_right_leg))
 
 
@@ -67,20 +75,16 @@ def draw_elipse(a, b, count):
     return x, y
 
 
-a = 0.06
-b = 0.06
-count = 100
+a = 0.02
+b = 0.07
+count = 50
 z, y = draw_elipse(a, b, count)
 
 
 step = 0
 while True:
-    if step % 200 < 100:
-        action = init_position()
-    else:
-        action = init_position2()
 
-    """if step < 100:
+    if step < 100:
         action = init_position()
     else:
         action = init_position2()
@@ -89,20 +93,22 @@ while True:
             index = count - step % count - 1
 
         # FL
-        action[1] = action[1] + y[index]
+        action[1] = action[1] - y[index]
         action[2] = action[2] - z[index]
 
         # RL
-        action[4] = action[4] - y[index]
+        action[4] = action[4] + y[index]
         action[5] = action[5] + z[index]
 
         # FR
-        action[7] = action[7] - y[index]
+        action[7] = action[7] + y[index]
         action[8] = action[8] + z[index]
 
         # RR
-        action[10] = action[10] + y[index]
-        action[11] = action[11] - z[index]"""
+        action[10] = action[10] - y[index]
+        action[11] = action[11] - z[index]
+
+    #action = init_position2()
 
     obs, reward, done, _, info = env.step(action)
 

@@ -1,6 +1,6 @@
 <mujoco model="qrpfra_v3_ik_model">
     <compiler angle="degree" coordinate="local"/>
-    <option integrator="RK4" timestep="0.01" gravity="0 0 -9.81" density="1.24"/>
+    <option integrator="RK4" timestep="0.02" gravity="0 0 -9.81" density="1.24"/>
 
     <default>
         <joint armature="1" damping="1" limited="true"/>
@@ -154,6 +154,7 @@
         <framequat name="abs_orientation_of_the_base" objtype="site" objname="base_link_Site"/-->
 
         <framepos name="Right_Foot_pos" reftype="site" refname="FR_Leg_ref" objtype="site" objname="front_Right_Wrist_Site"/>
+
         <jointpos name="FR_Hind2Base_angle" joint="FR_hind_to_base"/>
         <jointpos name="FR_Mid2Hind_angle" joint="FR_mid_to_base"/>
         <jointpos name="FR_Wrist2Mid_angle" joint="FR_wrist_to_mid"/>

@@ -15,11 +15,11 @@
         </default>
 
         <default class="Left_foot_Site">
-            <site pos="-0.016 0.13 -0.005" type="sphere" size="0.01"/>
+            <site pos="-0.016 0.13 -0.005" type="sphere" size="0.02"/>
         </default>
 
         <default class="Right_foot_Site">
-            <site pos="0.016 0.13 -0.005" type="sphere" size="0.01"/>
+            <site pos="0.016 0.13 -0.005" type="sphere" size="0.02"/>
         </default>
 
     </default>
@@ -32,10 +32,12 @@
         <mesh name="Right_Hind_Limb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_right_hindlimb_m.stl"/>
         <mesh name="Right_MidLimb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_right_midlimb_m.stl"/>
         <mesh name="Right_Wrist" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_right_wrist_m.stl"/>
+        <!--mesh name="map" file="/Users/deniz/Desktop/test_metric_depth/deneme2.stl"/-->
     </asset>
 
     <worldbody>
         <camera name="track" mode="trackcom" pos="0 -1 0.3" xyaxes="1 0 0 0 0 1"/>
+        <!--geom type="mesh" mesh="map" size="0.1"/-->
 
         <body name="base_link" pos="0 0 0.15">
             <geom type="mesh" mesh="main_body" mass="2" friction="0.3" contype="1" conaffinity="1" density="2400" />

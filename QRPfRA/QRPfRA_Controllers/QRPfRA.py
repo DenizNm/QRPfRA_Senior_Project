@@ -5,15 +5,9 @@ from gymnasium.error import Error
 from gymnasium.spaces import Box
 from gymnasium.utils.env_checker import check_env
 import tensorflow as tf
+import os
+import serial as pyserial
 
-"""right_leg_interpreter = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/right_leg_model_quantized.tflite')
-right_leg_interpreter.allocate_tensors()
-
-left_leg_interpreter = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/left_leg_model_quantized.tflite')
-left_leg_interpreter.allocate_tensors()
-
-fine_tuned_leg_interpreter = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/fine_tuned_leg_model_quantized.tflite')
-fine_tuned_leg_interpreter.allocate_tensors()"""
 
 fine_tuned_leg_interpreter_v2 = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/fine_tuned_leg_model_quantized.tflite')
 fine_tuned_leg_interpreter_v2.allocate_tensors()
@@ -30,7 +24,7 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
 
     def __init__(self,
                  xml_file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/qrpfra_v3_scene.xml",
-                 frame_skip=1, **kwargs):
+                 frame_skip=1, use_serial_port=False, **kwargs):
 
         utils.EzPickle.__init__(self, xml_file, frame_skip, **kwargs)
         MujocoEnv.__init__(
@@ -57,10 +51,14 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         self.observation_space = Box(
             low=-np.inf, high=np.inf, shape=(obs_size,), dtype=np.float64
         )
-        """self.left_leg_model = left_leg_interpreter
-        self.right_leg_model = right_leg_interpreter
-        self.fine_tuned_leg_model = fine_tuned_leg_interpreter"""
+
         self.fine_tuned_leg_model_v2 = fine_tuned_leg_interpreter_v2
+        self.use_serial_port = use_serial_port
+
+        if self.use_serial_port:
+            self.serial_port = pyserial.Serial('/dev/tty.usbserial-1110', 9600)
+            if not self.serial_port.is_open:
+                self.serial_port.open()
 
 
     def step(self, action):
@@ -74,12 +72,32 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         RR = self._run_inference(self.fine_tuned_leg_model_v2, action[9:12])
 
         action = np.array([FL, RL, FR, RR]).flatten()
+        action_to_send = action * 60 + 60
+        action_to_send = np.clip(action_to_send, 0, 120)
+        action_to_send[1:3] = 120 - action_to_send[1:3]
+        action_to_send[4:6] = 120 - action_to_send[4:6]
+        action_to_send = action_to_send.astype(np.uint8)
+        action_to_send = self._unionize_action_buffer(action_to_send)
+        #print("Action:", action_to_send)
+
+        action_to_send = ''.join(map(str, action_to_send))  # Convert list to string
+        print("Action to send:", action_to_send)
+        action_to_send = action_to_send.encode()  # Encode string to bytes
+
+        if self.use_serial_port:
+            self.serial_port.write(action_to_send)  # Write bytes to serial port
+            #msg = self.serial_port.read(1)
+            #print("Message:", msg.decode('utf-8'))
 
         self.do_simulation(action, self.frame_skip)
+
+
+
         observation = self._get_obs()
         #print("Obs:", observation)
 
         reward = self._compute_reward(observation, action) - 100
+
 
         info = {}
 
@@ -90,15 +108,19 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
 
         if observation[2] < -8:
             reward -= 500
+            done = True
 
         #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE
         self.step_count += 1
-        if self.step_count > 4000:
+        if self.step_count > 10000:
             done = True
 
         #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE
         #observation = observation/1000
         #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE
+
+        reward = int(reward)
+        #print("Reward:", reward)
 
         return observation, reward, done, False, info # done, false, info
 
@@ -107,6 +129,13 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         sensor_data[23:27] = [1 if i > 0.0 else 0.0 for i in sensor_data[23:27]]
 
         return sensor_data
+
+
+    def _unionize_action_buffer(self, action_buffer):
+        """ each degree must consists of 3 integers totaling 36 integers, if an incoming angle for eaxmple 72,
+         it must be converted to 072 rounded to 3 integers. """
+        return [f"{angle:03d}" for angle in action_buffer]
+
 
     def reset_model(self):
         qpos = self.init_qpos
@@ -138,16 +167,13 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         RL_hind_limb = observation[12]
         FR_hind_limb = observation[15]
         RR_hind_limb = observation[18]
+        foot_observation = sum(observation[23:27])
+
 
         x, y, z = tuple(baselink_pos)
-        if y >= 0:
-            reward = (y*20+2) ** 2 - abs(x) * 10
-            if 4 < observation[1] and abs(observation[0]) < 4:
-                reward += 8
-            else:
-                reward -= 8
-        else:
-            reward = (y) * 20 - abs(x) * 10
+
+        reward = (y*10) ** 3 - abs(x) * 10
+
 
 
         if (0.2 < observation[21] or observation[21] == -1 and
@@ -155,5 +181,18 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
             reward += 10
         else:
             reward -= 10
+
+        if FL_hind_limb < 0 or RL_hind_limb < 0 or FR_hind_limb > 0 or RR_hind_limb > 0:
+            reward -= 10000
+
+        if foot_observation >= 3:
+            reward += foot_observation * 50
+        else:
+            reward -= 1500
+
+        if observation[2] < -4 and self.step_count > 100:
+            reward -= 50000
+
+
 
         return reward
