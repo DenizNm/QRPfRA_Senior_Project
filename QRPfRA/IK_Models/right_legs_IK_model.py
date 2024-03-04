@@ -10,7 +10,7 @@ import tensorflow as tf
 
 
 
-leg_interpreter = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/fine_tuned_leg_model_quantized_v2.tflite')
+leg_interpreter = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/left_leg_model_quantized.tflite')
 leg_interpreter.allocate_tensors()
 
 class QRPfRA_v3(MujocoEnv, utils.EzPickle):
@@ -109,13 +109,13 @@ check_env(env)
 obs = env.reset()
 env.render_mode = "human"
 
+
 for i in range(10000000):
-    for i in range(-220, -120):
+    for i in range(-120, 120):
 
-        obs, reward, done, _, info = env.step([float(m) for m in [-0.025, 0.0, i/1000]])
-    for i in range(-120, -220, -1):
+        obs, reward, done, _, info = env.step([float(m) for m in [-0.05, i/1000, -0.16]])
+    for i in range(120, -120, -1):
         #action = env.action_space.sample()
-        obs, reward, done, _, info = env.step([float(m) for m in [-0.025, 0.0, i/1000]])
-
+        obs, reward, done, _, info = env.step([float(m) for m in [-0.05, i/1000, -0.16]])
 
 env.close()

@@ -52,7 +52,6 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
             low=-np.inf, high=np.inf, shape=(obs_size,), dtype=np.float64
         )
 
-        self.fine_tuned_leg_model_v2 = fine_tuned_leg_interpreter_v2
         self.use_serial_port = use_serial_port
 
         if self.use_serial_port:
@@ -63,42 +62,18 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
 
     def step(self, action):
         #Uncomment to run inference for TFlite inverse kinematics models
-        action = action.tolist()
 
-        FL = self._run_inference(self.fine_tuned_leg_model_v2, action[0:3])
-        RL = self._run_inference(self.fine_tuned_leg_model_v2, action[3:6])
 
-        FR = self._run_inference(self.fine_tuned_leg_model_v2, action[6:9])
-        RR = self._run_inference(self.fine_tuned_leg_model_v2, action[9:12])
-
-        action = np.array([FL, RL, FR, RR]).flatten()
-        action_to_send = action * 60 + 60
-        action_to_send = np.clip(action_to_send, 0, 120)
-        action_to_send[1:3] = 120 - action_to_send[1:3]
-        action_to_send[4:6] = 120 - action_to_send[4:6]
-        action_to_send = action_to_send.astype(np.uint8)
-        action_to_send = self._unionize_action_buffer(action_to_send)
-        #print("Action:", action_to_send)
-
-        action_to_send = ''.join(map(str, action_to_send))  # Convert list to string
-        print("Action to send:", action_to_send)
-        action_to_send = action_to_send.encode()  # Encode string to bytes
+        # Action is between -1 and 1
 
         if self.use_serial_port:
-            self.serial_port.write(action_to_send)  # Write bytes to serial port
-            #msg = self.serial_port.read(1)
-            #print("Message:", msg.decode('utf-8'))
+            self.sent_over_serial(action)
+
 
         self.do_simulation(action, self.frame_skip)
-
-
-
         observation = self._get_obs()
-        #print("Obs:", observation)
 
         reward = self._compute_reward(observation, action) - 100
-
-
         info = {}
 
         if self.render_mode == "human":
@@ -115,10 +90,6 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         if self.step_count > 10000:
             done = True
 
-        #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE
-        #observation = observation/1000
-        #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE
-
         reward = int(reward)
         #print("Reward:", reward)
 
@@ -126,7 +97,7 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
 
     def _get_obs(self):
         sensor_data = self.data.sensordata.flat.copy()
-        sensor_data[23:27] = [1 if i > 0.0 else 0.0 for i in sensor_data[23:27]]
+        sensor_data[23:27] = [1.0 if i > 0.0 else 0.0 for i in sensor_data[23:27]]
 
         return sensor_data
 
@@ -135,6 +106,23 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         """ each degree must consists of 3 integers totaling 36 integers, if an incoming angle for eaxmple 72,
          it must be converted to 072 rounded to 3 integers. """
         return [f"{angle:03d}" for angle in action_buffer]
+
+
+    def sent_over_serial(self, action):
+        action_to_send = action * 60 + 60
+        action_to_send = np.clip(action_to_send, 0, 120)
+        action_to_send[1:3] = 120 - action_to_send[1:3]
+        action_to_send[4:6] = 120 - action_to_send[4:6]
+        action_to_send = action_to_send.astype(np.uint8)
+        action_to_send = self._unionize_action_buffer(action_to_send)
+        # print("Action:", action_to_send)
+
+        action_to_send = ''.join(map(str, action_to_send))  # Convert list to string
+        print("Action to send:", action_to_send)
+        action_to_send = action_to_send.encode()  # Encode string to bytes
+        self.serial_port.write(action_to_send)  # Write bytes to serial port
+        # msg = self.serial_port.read(1)
+        # print("Message:", msg.decode('utf-8'))
 
 
     def reset_model(self):
@@ -149,16 +137,7 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
     def _get_reset_info(self):
         return {"works": True}
 
-    def _run_inference(self, model, input_data):
-        input_details = model.get_input_details()
-        output_details = model.get_output_details()
 
-        input_data = np.array(input_data, dtype=np.float32).reshape(1, -1)
-
-        model.set_tensor(input_details[0]['index'], input_data)
-        model.invoke()
-        output_data = model.get_tensor(output_details[0]['index'])
-        return output_data
 
     def _compute_reward(self, observation, action):
         # Get absolute position of the base

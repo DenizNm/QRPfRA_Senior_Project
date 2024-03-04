@@ -28,7 +28,26 @@ with open('/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/f
     f.write(left_leg_tflite_model)
 
 
+converter = tf.lite.TFLiteConverter.from_saved_model("/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/fine_tuned_legs_model_v3")
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+left_leg_tflite_model = converter.convert()
+with open('/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/fine_tuned_leg_model_quantized_v3.tflite', 'wb') as f:
+    f.write(left_leg_tflite_model)
 
+
+
+converter = tf.lite.TFLiteConverter.from_saved_model("/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/left_legs_model_plus50")
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+left_leg_tflite_model = converter.convert()
+with open('/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/left_legs_model_plus50.tflite', 'wb') as f:
+    f.write(left_leg_tflite_model)
+
+
+converter = tf.lite.TFLiteConverter.from_saved_model("/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/right_legs_model_plus50")
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+left_leg_tflite_model = converter.convert()
+with open('/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/right_legs_model_plus50.tflite', 'wb') as f:
+    f.write(left_leg_tflite_model)
 
 
 """# Load the TFLite models for inference

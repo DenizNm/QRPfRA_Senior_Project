@@ -36,7 +36,7 @@
 
     <worldbody>
         <body name="base_link" pos="0 0 0.5">
-            <camera name="track" mode="trackcom" pos="0.5 -0.5 0.3" xyaxes="1 0 0 0 0 1"/>
+            <camera name="track" mode="trackcom" pos="0 -1 0.3" xyaxes="1 0 0 0 0 1"/>
 
             <geom type="mesh" mesh="main_body" mass="2" friction="0.3" density="2400" />
             <!--joint limited="true" margin="0.01" name="root" pos="0 0 0" type="free" stiffness="0" damping="0" frictionloss="0" armature="0"/-->
