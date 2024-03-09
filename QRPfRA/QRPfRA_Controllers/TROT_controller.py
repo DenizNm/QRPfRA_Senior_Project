@@ -109,7 +109,7 @@ def _run_inference(model, input_data):
 
 def phase_transition_controller(act_in, act_out):
     err = act_out - act_in
-    action = act_in + 0.1 * err
+    action = act_in + 0.08 * err
     return action
 
 
