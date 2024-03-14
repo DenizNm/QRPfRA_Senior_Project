@@ -49,6 +49,12 @@ left_leg_tflite_model = converter.convert()
 with open('/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/right_legs_model_plus50.tflite', 'wb') as f:
     f.write(left_leg_tflite_model)
 
+converter = tf.lite.TFLiteConverter.from_saved_model("/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/IMU_to_orient")
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+left_leg_tflite_model = converter.convert()
+with open('/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/IMU_to_orient.tflite', 'wb') as f:
+    f.write(left_leg_tflite_model)
+
 
 """# Load the TFLite models for inference
 right_leg_interpreter = tf.lite.Interpreter(model_path='right_leg_model.tflite')

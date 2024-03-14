@@ -7,6 +7,7 @@ from gymnasium.utils.env_checker import check_env
 import tensorflow as tf
 import os
 import serial as pyserial
+from scipy.spatial.transform import Rotation as R
 
 
 fine_tuned_leg_interpreter_v2 = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/fine_tuned_leg_model_quantized.tflite')
@@ -87,8 +88,8 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
 
         #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE #### LOOK AT HERE
         self.step_count += 1
-        if self.step_count > 10000:
-            done = True
+        """if self.step_count > 10000:
+            done = True"""
 
         reward = int(reward)
         #print("Reward:", reward)
@@ -98,7 +99,6 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
     def _get_obs(self):
         sensor_data = self.data.sensordata.flat.copy()
         sensor_data[23:27] = [1.0 if i > 0.0 else 0.0 for i in sensor_data[23:27]]
-
         return sensor_data
 
 

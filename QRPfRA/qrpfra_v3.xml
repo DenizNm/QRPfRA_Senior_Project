@@ -194,6 +194,8 @@
         <touch name="RL_foot_touch" site="rear_Left_Wrist_Site" cutoff="1"/> <!-- 24 -->
         <touch name="FR_foot_touch" site="front_Right_Wrist_Site" cutoff="1"/> <!-- 25 -->
         <touch name="RR_foot_touch" site="rear_Right_Wrist_Site" cutoff="1"/> <!-- 26 -->
+
+        <framequat name="abs_orientation_of_the_base" objtype="site" objname="base_link_Site"/> <!-- 27 28 29 30 -->
     </sensor>
 
 </mujoco>
