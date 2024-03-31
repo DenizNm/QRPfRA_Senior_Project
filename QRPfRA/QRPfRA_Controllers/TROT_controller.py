@@ -86,34 +86,36 @@ def trot_generation(steps=100, reverse=False, fr_height_diff=0.0, left_leg_ctrl=
     front_right_rear_left = np.array([x_d2, y_d2, z_d2])
 
     # Adaptive control of the legs
-    #left_leg_x = [-0.07, 0.0, 0.0, 0.0]
+    left_leg_x = [0.0, 0.0, 0.0, 0.0]
     left_leg_y = [0.0, -left_leg_ctrl, 0.0, left_leg_ctrl]
-    #left_leg_z = [0.0, 0.0, 0.0, 0.0]
+    left_leg_z = [0.0, 0.0, 0.0, 0.0]
 
-    #right_leg_x = [0.0, 0.0, 0.0, 0.0]
+    right_leg_x = [0.0, 0.0, 0.0, 0.0]
     right_leg_y = [0.0, -right_leg_ctrl, 0.0, right_leg_ctrl]
-    #right_leg_z = [0.0, 0.0, 0.0, 0.0]
+    right_leg_z = [0.0, 0.0, 0.0, 0.0]
 
-    #left_leg_x = generate_points(left_leg_x, steps+1)
+    left_leg_x = generate_points(left_leg_x, steps+1)
     left_leg_y = generate_points(left_leg_y, steps+1)
-    #left_leg_z = generate_points(left_leg_z, steps+1)
+    left_leg_z = generate_points(left_leg_z, steps+1)
 
-    #right_leg_x = generate_points(right_leg_x, steps+1)
+    right_leg_x = generate_points(right_leg_x, steps+1)
     right_leg_y = generate_points(right_leg_y, steps+1)
-    #right_leg_z = generate_points(right_leg_z, steps+1)
+    right_leg_z = generate_points(right_leg_z, steps+1)
 
     if not reverse:
         trot_action = np.concatenate(
-            (front_left_rear_right + left_leg_y, front_right_rear_left + left_leg_y, front_right_rear_left + right_leg_y, front_left_rear_right+ right_leg_y)).T
+            (front_left_rear_right + left_leg_y, front_right_rear_left + left_leg_y,
+             front_right_rear_left + right_leg_y, front_left_rear_right + right_leg_y)).T
     elif reverse:
         trot_action = np.concatenate(
-            (front_left_rear_right + left_leg_y, front_right_rear_left + left_leg_y, front_right_rear_left + right_leg_y, front_left_rear_right + right_leg_y)).T
+            (front_left_rear_right + left_leg_y, front_right_rear_left + left_leg_y,
+             front_right_rear_left + right_leg_y, front_left_rear_right + right_leg_y)).T
 
     # Clip the y values
-    trot_action[:, 1] = np.clip(np.add(trot_action[:, 1] , left_leg_y), -0.1, 0.1)
-    trot_action[:, 4] = np.clip(np.add(trot_action[:, 4] , left_leg_y), -0.1, 0.1)
-    trot_action[:, 7] = np.clip(np.add(trot_action[:, 7] , right_leg_y), -0.1, 0.1)
-    trot_action[:, 10] = np.clip(np.add(trot_action[:, 10] , right_leg_y), -0.1, 0.1)
+    trot_action[:, 1] = np.clip(np.add(trot_action[:, 1], left_leg_y), -0.1, 0.1)
+    trot_action[:, 4] = np.clip(np.add(trot_action[:, 4], left_leg_y), -0.1, 0.1)
+    trot_action[:, 7] = np.clip(np.add(trot_action[:, 7], right_leg_y), -0.1, 0.1)
+    trot_action[:, 10] = np.clip(np.add(trot_action[:, 10], right_leg_y), -0.1, 0.1)
 
     # Add the height difference
     trot_action[:, 5] = trot_action[:, 5] + fr_height_diff
@@ -126,11 +128,10 @@ def trot_generation(steps=100, reverse=False, fr_height_diff=0.0, left_leg_ctrl=
     trot_action[:, 11] = np.clip(trot_action[:, 11], -0.195, -0.1)
 
     # Clip the x values
-    trot_action[:, 0] = np.clip(trot_action[:, 0], -0.15, 0.05)
-    trot_action[:, 3] = np.clip(trot_action[:, 3], -0.15, 0.05)
-    trot_action[:, 6] = np.clip(trot_action[:, 6], -0.15, 0.05)
-    trot_action[:, 9] = np.clip(trot_action[:, 9], -0.15, 0.05)
-
+    trot_action[:, 0] = np.clip(trot_action[:, 0], -0.09, 0.01)
+    trot_action[:, 3] = np.clip(trot_action[:, 3], -0.09, 0.01)
+    trot_action[:, 6] = np.clip(trot_action[:, 6], -0.09, 0.01)
+    trot_action[:, 9] = np.clip(trot_action[:, 9], -0.09, 0.01)
 
     return trot_action
 
@@ -207,6 +208,15 @@ total_steps = 75
 generated_action = trot_generation(total_steps, reverse=False, fr_height_diff=-0.02, left_leg_ctrl=0.0, right_leg_ctrl=0.0)
 
 
+def update_y_list(y_list, y):
+    y_list = np.roll(y_list, 1)
+    y_list[0] = y
+    return y_list, np.mean(y_list)
+
+
+
+prev_y_list = np.zeros(100)
+
 current_observations = np.zeros(num_states)
 in_step_cnt = 0
 while True:
@@ -217,17 +227,14 @@ while True:
 
         in_step_cnt += 1
 
-        clip_around = 0.11
         control_y_direction = get_orientation(current_observations, IMU_to_orient_model)
-        if step > 2000 <= 4000:
-            desired = 120
-        elif step > 4000:
-            desired = 30
-        else:
-            desired = -60
-        error = (control_y_direction - desired) * 0.05
+        prev_y_list, mean_y_direction = update_y_list(prev_y_list, control_y_direction)
 
-        print(f"Control y direction: {control_y_direction}, Error: {error}")
+        desired = 30
+        error = (mean_y_direction - desired) * 0.1
+
+
+        #print(f"Control y direction: {mean_y_direction}, Error: {error}")
         if error > 0:
             generated_action = trot_generation(total_steps, reverse=False, fr_height_diff=-0.02,
                                                left_leg_ctrl=0.01 * abs(error), right_leg_ctrl=0)

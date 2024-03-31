@@ -6,12 +6,9 @@ from gymnasium.spaces import Box
 from gymnasium.utils.env_checker import check_env
 import tensorflow as tf
 import os
-import serial as pyserial
+import serial
 from scipy.spatial.transform import Rotation as R
-
-
-fine_tuned_leg_interpreter_v2 = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/fine_tuned_leg_model_quantized.tflite')
-fine_tuned_leg_interpreter_v2.allocate_tensors()
+import time
 
 
 class QRPfRA_v3(MujocoEnv, utils.EzPickle):
@@ -54,21 +51,19 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         )
 
         self.use_serial_port = use_serial_port
+        self.serial_port_name = "/dev/tty.usbserial-110"
+        self.baud_rate = 115200
 
         if self.use_serial_port:
-            self.serial_port = pyserial.Serial('/dev/tty.usbserial-1110', 9600)
-            if not self.serial_port.is_open:
-                self.serial_port.open()
-
+            self.serial_port = serial.Serial(self.serial_port_name, self.baud_rate)
+            print("Serial port opened")
+            time.sleep(2)
 
     def step(self, action):
-        #Uncomment to run inference for TFlite inverse kinematics models
-
-
         # Action is between -1 and 1
-
+        action_np = np.array(action)
         if self.use_serial_port:
-            self.sent_over_serial(action)
+            self.send_over_serial(action_np)
 
 
         self.do_simulation(action, self.frame_skip)
@@ -107,22 +102,42 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
          it must be converted to 072 rounded to 3 integers. """
         return [f"{angle:03d}" for angle in action_buffer]
 
-
-    def sent_over_serial(self, action):
+    def send_over_serial(self, action):
+        #TODO: Convert the function to be compatible with Rasberry Pi
         action_to_send = action * 60 + 60
         action_to_send = np.clip(action_to_send, 0, 120)
-        action_to_send[1:3] = 120 - action_to_send[1:3]
-        action_to_send[4:6] = 120 - action_to_send[4:6]
-        action_to_send = action_to_send.astype(np.uint8)
-        action_to_send = self._unionize_action_buffer(action_to_send)
-        # print("Action:", action_to_send)
+        """action_to_send[1:3] = 120 - action_to_send[1:3]
+        action_to_send[4:6] = 120 - action_to_send[4:6]"""
+        #action_to_send[6:] = 120 - action_to_send[6:]
+        # Convert to integer
+        action_to_send = action_to_send.astype(int)
+        print("Action to send:", action_to_send)
+        print("Action to send shape:", action_to_send.shape)
+
+        # Ensure data_array has the correct size and type
+        if not isinstance(action_to_send, np.ndarray) or action_to_send.size != 12:
+            raise ValueError("data_array must be a NumPy array of 12 integers.")
+
+        # Convert each integer to a 3-character string, concatenate, and enclose in < and >
+        data_str = '<' + ''.join([f"{num:03}" for num in action_to_send]) + '>'
+
+        # Establish a serial connection
+        self.serial_port.write(data_str.encode('utf-8') + b'\n')
+        print("Data sent:", data_str.encode('utf-8'))
+        #time.sleep(0.02)  # Wait for the Arduino to process the data
+        response = self.serial_port.readline().decode('utf-8').strip()
+        if response:  # Only print if there's a response
+            print("Arduino response:", response)
+        #time.sleep(0.5)  # Add a small delay to prevent spamming the Arduino
+
+        """# print("Action:", action_to_send)
 
         action_to_send = ''.join(map(str, action_to_send))  # Convert list to string
         print("Action to send:", action_to_send)
         action_to_send = action_to_send.encode()  # Encode string to bytes
         self.serial_port.write(action_to_send)  # Write bytes to serial port
         # msg = self.serial_port.read(1)
-        # print("Message:", msg.decode('utf-8'))
+        # print("Message:", msg.decode('utf-8'))"""
 
 
     def reset_model(self):

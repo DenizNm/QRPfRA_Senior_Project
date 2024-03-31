@@ -25,13 +25,13 @@
     </default>
 
     <asset>
-        <mesh name="main_body" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_body_m.stl"/>
-        <mesh name="Left_Hind_Limb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_left_hindlimb_m.stl"/>
-        <mesh name="Left_MidLimb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_left_midlimb_m.stl"/>
-        <mesh name="Left_Wrist" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_left_wrist_m.stl"/>
-        <mesh name="Right_Hind_Limb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_right_hindlimb_m.stl"/>
-        <mesh name="Right_MidLimb" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_right_midlimb_m.stl"/>
-        <mesh name="Right_Wrist" file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/QRPfRA_right_wrist_m.stl"/>
+        <mesh name="main_body" file="QRPfRA_body_m.stl"/>
+        <mesh name="Left_Hind_Limb" file="QRPfRA_left_hindlimb_m.stl"/>
+        <mesh name="Left_MidLimb" file="QRPfRA_left_midlimb_m.stl"/>
+        <mesh name="Left_Wrist" file="QRPfRA_left_wrist_m.stl"/>
+        <mesh name="Right_Hind_Limb" file="QRPfRA_right_hindlimb_m.stl"/>
+        <mesh name="Right_MidLimb" file="QRPfRA_right_midlimb_m.stl"/>
+        <mesh name="Right_Wrist" file="QRPfRA_right_wrist_m.stl"/>
         <!--mesh name="map" file="/Users/deniz/Desktop/test_metric_depth/deneme2.stl"/-->
     </asset>
 
