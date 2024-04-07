@@ -122,16 +122,16 @@ def trot_generation(steps=100, reverse=False, fr_height_diff=0.0, left_leg_ctrl=
     trot_action[:, 11] = trot_action[:, 11] + fr_height_diff
 
     # Clip the z values
-    trot_action[:, 2] = np.clip(trot_action[:, 2], -0.195, -0.1)
-    trot_action[:, 5] = np.clip(trot_action[:, 5], -0.195, -0.1)
-    trot_action[:, 8] = np.clip(trot_action[:, 8], -0.195, -0.1)
-    trot_action[:, 11] = np.clip(trot_action[:, 11], -0.195, -0.1)
+    trot_action[:, 2] = np.clip(trot_action[:, 2], -0.195, -0.1)  # L
+    trot_action[:, 5] = np.clip(trot_action[:, 5], -0.195, -0.1)  # L
+    trot_action[:, 8] = np.clip(trot_action[:, 8], -0.195, -0.1)  # R
+    trot_action[:, 11] = np.clip(trot_action[:, 11], -0.195, -0.1)  # R
 
     # Clip the x values
-    trot_action[:, 0] = np.clip(trot_action[:, 0], -0.09, 0.01)
-    trot_action[:, 3] = np.clip(trot_action[:, 3], -0.09, 0.01)
-    trot_action[:, 6] = np.clip(trot_action[:, 6], -0.09, 0.01)
-    trot_action[:, 9] = np.clip(trot_action[:, 9], -0.09, 0.01)
+    trot_action[:, 0] = np.clip(trot_action[:, 0], -0.09, 0.01)  # L
+    trot_action[:, 3] = np.clip(trot_action[:, 3], -0.09, 0.01)  # L
+    trot_action[:, 6] = np.clip(trot_action[:, 6], -0.09, 0.01)  # R
+    trot_action[:, 9] = np.clip(trot_action[:, 9], -0.09, 0.01)  # R
 
     return trot_action
 

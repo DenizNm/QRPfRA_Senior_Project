@@ -24,15 +24,12 @@ controller = TROT(tf_lite_model_path=os.path.dirname(os.getcwd()).replace("\\", 
                   env_num_actions=num_actions,
                   env_num_states=num_states)
 
-
-
-
 step = 0
 current_obs = np.zeros(num_states)
 current_action = np.zeros(num_actions)
 current_angle = 0
 while True:
-    desired = -15
+    desired = 0
     action = controller.get_action_xyz(step, observation=current_obs, action_angle=current_action, desired=desired)
 
     obs, reward, done, _, info = env.step(action)
@@ -43,4 +40,3 @@ while True:
         env.reset()
 
     step += 1
-
