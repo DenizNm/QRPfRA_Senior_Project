@@ -169,8 +169,6 @@
         <gyro name="gyroscope" site="base_link_Site"/> <!-- 3 4 5 -->
         <magnetometer name="magnetometer" site="base_link_Site"/> <!-- 6 7 8 -->
 
-        <!--framequat name="abs_orientation_of_the_base" reftype="body" refname="base_link" objtype="site" objname="base_link_Site"/--> <!-- 9 10 11 12 -->
-
         <jointpos name="FL_Hind2Base_angle" joint="FL_hind_to_base"/> <!-- 9 -->
         <jointpos name="FL_Mid2Hind_angle" joint="FL_mid_to_base"/> <!-- 10 -->
         <jointpos name="FL_Wrist2Mid_angle" joint="FL_wrist_to_mid"/> <!-- 11 -->
@@ -187,15 +185,7 @@
         <jointpos name="RR_Mid2Hind_angle" joint="RR_mid_to_base"/> <!-- 19 -->
         <jointpos name="RR_Wrist2Mid_angle" joint="RR_wrist_to_mid"/> <!-- 20 -->
 
-        <rangefinder name="head_rangefinder" site="head_rangefinder"/> <!-- 21 -->
-        <rangefinder name="rear_rangefinder" site="rear_rangefinder"/> <!-- 22 -->
-
-        <touch name="FL_foot_touch" site="front_Left_Wrist_Site" cutoff="1"/> <!-- 23 -->
-        <touch name="RL_foot_touch" site="rear_Left_Wrist_Site" cutoff="1"/> <!-- 24 -->
-        <touch name="FR_foot_touch" site="front_Right_Wrist_Site" cutoff="1"/> <!-- 25 -->
-        <touch name="RR_foot_touch" site="rear_Right_Wrist_Site" cutoff="1"/> <!-- 26 -->
-
-        <framequat name="abs_orientation_of_the_base" objtype="site" objname="base_link_Site"/> <!-- 27 28 29 30 -->
+        <framequat name="abs_orientation_of_the_base" objtype="site" objname="base_link_Site"/> <!-- 21 22 23 24 -->
     </sensor>
 
 </mujoco>

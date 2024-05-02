@@ -3,11 +3,17 @@ from gymnasium.utils.env_checker import check_env
 import QRPfRA
 import tensorflow as tf
 from scipy.spatial.transform import Rotation as R
+import pygame
 
 env = QRPfRA.QRPfRA_v3(use_serial_port=False)
 check_env(env)
 obs = env.reset()
 env.render_mode = "human"
+
+# Initialize Pygame
+pygame.init()
+screen = pygame.display.set_mode((1, 1))
+
 
 num_states = env.observation_space.shape[0]
 print("Size of State Space ->  {}".format(num_states))
@@ -25,9 +31,6 @@ right_leg_model.allocate_tensors()
 
 left_leg_model = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/left_leg_model_quantized.tflite')
 left_leg_model.allocate_tensors()
-
-IMU_to_orient_model = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/IMU_to_orient.tflite')
-IMU_to_orient_model.allocate_tensors()
 
 def init_position():
     front_left_leg = np.array([-0.05, 0.0, -0.1])
@@ -65,13 +68,13 @@ def generate_points(input_list, total_step):
 
 
 def trot_generation(steps=100, reverse=False, fr_height_diff=0.0, left_leg_ctrl=0, right_leg_ctrl=0):
-    x_keyframes_d1 = [-0.05, -0.05, -0.05, -0.05]
-    y_keyframes_d1 = [0.0, -0.05, 0.0, 0.05]
-    z_keyframes_d1 = [-0.12, -0.15, -0.1, -0.15]
+    x_keyframes_d1 = [-0.05, -0.05, -0.05]
+    y_keyframes_d1 = [-0.04, 0.04, -0.04]
+    z_keyframes_d1 = [-0.12, -0.1, -0.12]
 
-    x_keyframes_d2 = [-0.05, -0.05, -0.05, -0.05]
-    y_keyframes_d2 = [0.0, 0.05, 0.0, -0.05]
-    z_keyframes_d2 = [-0.1, -0.15, -0.12, -0.15]
+    x_keyframes_d2 = [-0.05, -0.05, -0.05]
+    y_keyframes_d2 = [0.04, -0.04, 0.04]
+    z_keyframes_d2 = [-0.1, -0.12, -0.1]
 
     # Interpolate as much as the number of steps
     x_d1 = generate_points(x_keyframes_d1, steps+1)
@@ -86,13 +89,13 @@ def trot_generation(steps=100, reverse=False, fr_height_diff=0.0, left_leg_ctrl=
     front_right_rear_left = np.array([x_d2, y_d2, z_d2])
 
     # Adaptive control of the legs
-    left_leg_x = [0.0, 0.0, 0.0, 0.0]
-    left_leg_y = [0.0, -left_leg_ctrl, 0.0, left_leg_ctrl]
-    left_leg_z = [0.0, 0.0, 0.0, 0.0]
+    left_leg_x = [0.0, 0.0, 0.0]
+    left_leg_y = [0.0, -left_leg_ctrl, 0.0]
+    left_leg_z = [0.0, 0.0, 0.0]
 
-    right_leg_x = [0.0, 0.0, 0.0, 0.0]
-    right_leg_y = [0.0, -right_leg_ctrl, 0.0, right_leg_ctrl]
-    right_leg_z = [0.0, 0.0, 0.0, 0.0]
+    right_leg_x = [0.0, 0.0, 0.0]
+    right_leg_y = [0.0, -right_leg_ctrl, 0.0]
+    right_leg_z = [0.0, 0.0, 0.0]
 
     left_leg_x = generate_points(left_leg_x, steps+1)
     left_leg_y = generate_points(left_leg_y, steps+1)
@@ -135,6 +138,66 @@ def trot_generation(steps=100, reverse=False, fr_height_diff=0.0, left_leg_ctrl=
 
     return trot_action
 
+
+
+def trot_V2(steps=100, reverse=False, fr_height_diff=0.0, left_leg_ctrl=0, right_leg_ctrl=0):
+    FL_x = np.ones(4) * -0.05
+    FL_y = np.array([(left_leg_ctrl + 0.04), -(left_leg_ctrl + 0.02),  -(left_leg_ctrl + 0.02),  (left_leg_ctrl + 0.04)])
+    FL_z = np.array([-(0.14 - left_leg_ctrl/10), -(0.15 + left_leg_ctrl/5), -(0.15 - left_leg_ctrl/5), -(0.13 + left_leg_ctrl/10)])
+
+    RL_x = np.ones(4) * -0.05
+    RL_y = np.array([-(left_leg_ctrl + 0.02),  (left_leg_ctrl + 0.04), (left_leg_ctrl + 0.04), -(left_leg_ctrl + 0.02)])
+    RL_z = np.array([-(0.15 + left_leg_ctrl/5), -(0.13 - left_leg_ctrl/10), -(0.15 + left_leg_ctrl/5), -(0.14 - left_leg_ctrl/10)]) - 0.02
+
+    FR_x = np.ones(4) * -0.05
+    FR_y = np.array([-(right_leg_ctrl+0.02),  (right_leg_ctrl + 0.04), (right_leg_ctrl + 0.04), -(right_leg_ctrl + 0.02)])
+    FR_z = np.array([-(0.15 + right_leg_ctrl/5), -(0.13 - right_leg_ctrl/10), -(0.15 + right_leg_ctrl/5), -(0.14 - right_leg_ctrl/10)])
+
+    RR_x = np.ones(4) * -0.05
+    RR_y = np.array([(right_leg_ctrl + 0.04),  -(right_leg_ctrl + 0.02), -(right_leg_ctrl + 0.02),  (right_leg_ctrl + 0.04)])
+    RR_z = np.array([-(0.14 - right_leg_ctrl/10), -(0.15 + right_leg_ctrl/5), -(0.15 - right_leg_ctrl/5), -(0.13 + right_leg_ctrl/10)]) - 0.02
+
+
+    if not reverse:
+        FL = [FL_x, FL_y, FL_z]
+        RL = [RL_x, RL_y, RL_z]
+        FR = [FR_x, FR_y, FR_z]
+        RR = [RR_x, RR_y, RR_z]
+    elif reverse:
+        FL = [FL_x, RL_y, FL_z]
+        RL = [RL_x, FL_y, RL_z]
+        FR = [FR_x, RR_y, FR_z]
+        RR = [RR_x, FR_y, RR_z]
+
+    FL_generated = [generate_points(coordination, steps+1) for coordination in FL]
+    RL_generated = [generate_points(coordination, steps+1) for coordination in RL]
+    FR_generated = [generate_points(coordination, steps+1) for coordination in FR]
+    RR_generated = [generate_points(coordination, steps+1) for coordination in RR]
+
+    FL_generated[:][0] = np.clip(FL_generated[:][0], -0.09, 0.01)
+    RL_generated[:][0] = np.clip(RL_generated[:][0], -0.09, 0.01)
+    FR_generated[:][0] = np.clip(FR_generated[:][0], -0.09, 0.01)
+    RR_generated[:][0] = np.clip(RR_generated[:][0], -0.09, 0.01)
+
+    FL_generated[:][1] = np.clip(FL_generated[:][1], -0.06, 0.06)
+    RL_generated[:][1] = np.clip(RL_generated[:][1], -0.06, 0.06)
+    FR_generated[:][1] = np.clip(FR_generated[:][1], -0.06, 0.06)
+    RR_generated[:][1] = np.clip(RR_generated[:][1], -0.06, 0.06)
+
+    FL_generated[:][2] = np.clip(FL_generated[:][2], -0.195, -0.09)
+    RL_generated[:][2] = np.clip(RL_generated[:][2], -0.195, -0.09)
+    FR_generated[:][2] = np.clip(FR_generated[:][2], -0.195, -0.09)
+    RR_generated[:][2] = np.clip(RR_generated[:][2], -0.195, -0.09)
+
+    foot_list = np.concatenate((FL_generated, RL_generated, FR_generated, RR_generated)).T
+
+    return foot_list
+
+
+
+
+
+
 def _run_inference(model, input_data):
     input_details = model.get_input_details()
     output_details = model.get_output_details()
@@ -172,17 +235,9 @@ def action_xyz_to_angle(action_xyz, current_action_angle):
     return action_angle
 
 
-
-def get_orientation(observation, model=IMU_to_orient_model):
-    """acc_gyro = np.array(observation[0:6]).reshape(1,6)
-    acc_gyro = np.expand_dims(acc_gyro, axis=2)  # Add an extra dimension
-    print("Acc and gyro:", acc_gyro)
-    print("Acc and gyro:", acc_gyro.shape)
-    orientation = _run_inference(model, acc_gyro)
-    print("Orientation:", orientation)
-    control_y_direction = orientation[0][2]"""
+def get_orientation(observation):
     #TODO: Obtain the orientation from accelerometer and gyroscope, delete framequat in xml file
-    rotation = R.from_quat(observation[27:])
+    rotation = R.from_quat(observation[21:])
     # print(rotation)
     coordinates = "YZX"
     euler_angles = rotation.as_euler(coordinates, degrees=True)
@@ -194,64 +249,76 @@ def get_orientation(observation, model=IMU_to_orient_model):
     control_y_direction = euler_angles[2]
     return control_y_direction
 
-current_action_angle = np.zeros(12).flatten()
-step = 0
-
-
-
-#print("Shape is:", generated_action.shape)
-
-left_leg_ctrl = 0.0
-right_leg_ctrl = 0.0
-
-total_steps = 75
-generated_action = trot_generation(total_steps, reverse=False, fr_height_diff=-0.02, left_leg_ctrl=0.0, right_leg_ctrl=0.0)
-
-
 def update_y_list(y_list, y):
     y_list = np.roll(y_list, 1)
     y_list[0] = y
     return y_list, np.mean(y_list)
 
 
+current_action_angle = np.zeros(12).flatten()
+step = 0
+left_leg_ctrl = 0.0
+right_leg_ctrl = 0.0
 
-prev_y_list = np.zeros(100)
+total_steps = 50
+generated_action = trot_V2(total_steps, reverse=False, fr_height_diff=0.02, left_leg_ctrl=0.0, right_leg_ctrl=0.0)
 
+prev_y_list = np.zeros(5)
 current_observations = np.zeros(num_states)
 in_step_cnt = 0
+
+desired = 0
+init_pos = False
 while True:
-    if step > 100:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            quit()
+    keys = pygame.key.get_pressed()
+
+    if step > 100 and not init_pos:
         action_xyz = generated_action[in_step_cnt, :]
         if in_step_cnt == (total_steps-2):
             in_step_cnt = 0
 
         in_step_cnt += 1
 
-        control_y_direction = get_orientation(current_observations, IMU_to_orient_model)
+        control_y_direction = get_orientation(current_observations)
         prev_y_list, mean_y_direction = update_y_list(prev_y_list, control_y_direction)
 
-        desired = 30
-        error = (mean_y_direction - desired) * 0.1
+        # Adjust desired angle using keyboard input from A bd G keys
+        if keys[pygame.K_a]:
+            desired += 1
+        if keys[pygame.K_g]:
+            desired -= 1
 
 
-        #print(f"Control y direction: {mean_y_direction}, Error: {error}")
+        desired = np.clip(desired, -178, 178)
+        print(f"Desired: {desired}, Control y direction: {mean_y_direction}")
+
+        error = (mean_y_direction - desired) * 0.0016
         if error > 0:
-            generated_action = trot_generation(total_steps, reverse=False, fr_height_diff=-0.02,
-                                               left_leg_ctrl=0.01 * abs(error), right_leg_ctrl=0)
+            generated_action = trot_V2(total_steps, reverse=False, fr_height_diff=-0.01,
+                                               left_leg_ctrl= abs(error), right_leg_ctrl=-0.8 * abs(error))
         else:
-            generated_action = trot_generation(total_steps, reverse=False, fr_height_diff=-0.02,
-                                               left_leg_ctrl=0, right_leg_ctrl=0.01 * abs(error))
+            generated_action = trot_V2(total_steps, reverse=False, fr_height_diff=-0.01,
+                                               left_leg_ctrl=-0.8 * abs(error), right_leg_ctrl= abs(error))
 
-    elif step <= 100:
+    elif step <= 100 or init_pos:
         action_xyz = init_position()
 
+
+    if keys[pygame.K_p]:
+        if init_pos:
+            init_pos = False
+        else:
+            init_pos = True
 
 
     action_angle = action_xyz_to_angle(action_xyz, current_action_angle)
     obs, reward, done, _, info = env.step(action_angle)
     current_action_angle = action_angle
     current_observations = obs
-
 
     if done:
         env.reset()
