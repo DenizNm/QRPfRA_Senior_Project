@@ -1,8 +1,15 @@
 import numpy as np
 from gymnasium import utils
 from gymnasium.envs.mujoco import MujocoEnv
+from gymnasium.error import Error
 from gymnasium.spaces import Box
-
+from gymnasium.utils.env_checker import check_env
+import tensorflow as tf
+import os
+import serial
+from scipy.spatial.transform import Rotation as R
+import time
+from time import sleep as sl
 
 class QRPfRA_v3(MujocoEnv, utils.EzPickle):
     metadata = {
@@ -14,8 +21,8 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
     }
 
     def __init__(self,
-                 xml_file="/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/qrpfra_v3_scene_extended.xml",
-                 frame_skip=1, use_serial_port=False, **kwargs):
+                 xml_file="~/vscode_projects/QRPfRA_Senior_Project/QRPfRA/qrpfra_v3_scene.xml",
+                 frame_skip=1, raspberry_pi=False, **kwargs):
 
         utils.EzPickle.__init__(self, xml_file, frame_skip, **kwargs)
         MujocoEnv.__init__(
@@ -43,12 +50,46 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
             low=-np.inf, high=np.inf, shape=(obs_size,), dtype=np.float64
         )
 
-        self.raspberry_pi = False
+        self.raspberry_pi = raspberry_pi
+        
+        if self.raspberry_pi:
+            from adafruit_servokit import ServoKit
+            self.kit = ServoKit(channels=16)
+            for servo_num in range(0,12):
+                self.kit.servo[servo_num].actuation_range = 180
+
+
 
     def step(self, action):
-        # TODO: Implement the raspberry pi control over pi
         if self.raspberry_pi:
-            pass
+            action_to_send = action * 90 + 90
+            action_to_send = np.clip(action_to_send, 0, 180)
+            action_to_send[1:3] = 180 - action_to_send[1:3]
+            action_to_send[4:6] = 180 - action_to_send[4:6]
+
+            action_to_send[0] = action_to_send[0] - 30
+            action_to_send[1] = action_to_send[1] - 30
+            action_to_send[2] = action_to_send[2] - 30
+            
+            action_to_send[3] = action_to_send[3] - 40
+            action_to_send[4] = action_to_send[4] - 10
+            action_to_send[5] = action_to_send[5] - 30
+            
+            action_to_send[6] = action_to_send[6]
+            action_to_send[7] = action_to_send[7]
+            
+            action_to_send[8] = action_to_send[8]
+            
+            action_to_send[9] = action_to_send[9] + 10
+            action_to_send[10] = action_to_send[10]
+            action_to_send[11] = action_to_send[11]
+
+            
+            action_to_send = np.clip(np.array(action_to_send, dtype=np.uint8), 0, 180)
+            print(action_to_send)
+
+            for servo_num, angle in enumerate(action_to_send):
+                self.kit.servo[servo_num].angle = angle
 
 
 

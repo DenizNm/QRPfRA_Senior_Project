@@ -1,14 +1,15 @@
 import numpy as np
 from gymnasium.utils.env_checker import check_env
-import QRPfRA_Cam as QRPfRA
+import QRPfRA
 import tensorflow as tf
 from scipy.spatial.transform import Rotation as R
 import pygame
 
-env = QRPfRA.QRPfRA_v3(use_serial_port=False)
+env = QRPfRA.QRPfRA_v3(raspberry_pi=True)
 check_env(env)
 obs = env.reset()
-env.render_mode = "human"
+#env.render_mode = "human"
+
 
 # Initialize Pygame
 pygame.init()
@@ -26,10 +27,10 @@ lower_bound = env.action_space.low[0]
 print("Max Value of Action ->  {}".format(upper_bound))
 print("Min Value of Action ->  {}".format(lower_bound))
 
-right_leg_model = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/left_leg_model_quantized.tflite')
+right_leg_model = tf.lite.Interpreter(model_path='/home/deniz/vscode_projects/QRPfRA_Senior_Project/QRPfRA/IK_Models/left_leg_model_quantized.tflite')
 right_leg_model.allocate_tensors()
 
-left_leg_model = tf.lite.Interpreter(model_path='/Users/deniz/PycharmProjects/QRPfRA_Senior_Project/QRPfRA/IK_Models/left_leg_model_quantized.tflite')
+left_leg_model = tf.lite.Interpreter(model_path='/home/deniz/vscode_projects/QRPfRA_Senior_Project/QRPfRA/IK_Models/left_leg_model_quantized.tflite')
 left_leg_model.allocate_tensors()
 
 def init_position():
@@ -143,19 +144,19 @@ def trot_generation(steps=100, reverse=False, fr_height_diff=0.0, left_leg_ctrl=
 def trot_V2(steps=100, reverse=False, fr_height_diff=0.0, left_leg_ctrl=0, right_leg_ctrl=0):
     FL_x = np.ones(4) * -0.05
     FL_y = np.array([(left_leg_ctrl + 0.04), -(left_leg_ctrl + 0.02),  -(left_leg_ctrl + 0.02),  (left_leg_ctrl + 0.04)])
-    FL_z = np.array([-(0.14 - left_leg_ctrl/10), -(0.15 + left_leg_ctrl/5), -(0.15 - left_leg_ctrl/5), -(0.13 + left_leg_ctrl/10)])
+    FL_z = np.array([-(0.14 - left_leg_ctrl/10), -(0.16 + left_leg_ctrl/5), -(0.16 - left_leg_ctrl/5), -(0.13 + left_leg_ctrl/10)])
 
     RL_x = np.ones(4) * -0.05
     RL_y = np.array([-(left_leg_ctrl + 0.02),  (left_leg_ctrl + 0.04), (left_leg_ctrl + 0.04), -(left_leg_ctrl + 0.02)])
-    RL_z = np.array([-(0.15 + left_leg_ctrl/5), -(0.13 - left_leg_ctrl/10), -(0.15 + left_leg_ctrl/5), -(0.14 - left_leg_ctrl/10)]) + fr_height_diff
+    RL_z = np.array([-(0.18 + left_leg_ctrl/5), -(0.13 - left_leg_ctrl/10), -(0.18 + left_leg_ctrl/5), -(0.14 - left_leg_ctrl/10)]) - 0.02
 
     FR_x = np.ones(4) * -0.05
     FR_y = np.array([-(right_leg_ctrl+0.02),  (right_leg_ctrl + 0.04), (right_leg_ctrl + 0.04), -(right_leg_ctrl + 0.02)])
-    FR_z = np.array([-(0.15 + right_leg_ctrl/5), -(0.13 - right_leg_ctrl/10), -(0.15 + right_leg_ctrl/5), -(0.14 - right_leg_ctrl/10)])
+    FR_z = np.array([-(0.18 + right_leg_ctrl/5), -(0.13 - right_leg_ctrl/10), -(0.18 + right_leg_ctrl/5), -(0.14 - right_leg_ctrl/10)])
 
     RR_x = np.ones(4) * -0.05
     RR_y = np.array([(right_leg_ctrl + 0.04),  -(right_leg_ctrl + 0.02), -(right_leg_ctrl + 0.02),  (right_leg_ctrl + 0.04)])
-    RR_z = np.array([-(0.14 - right_leg_ctrl/10), -(0.15 + right_leg_ctrl/5), -(0.15 - right_leg_ctrl/5), -(0.13 + right_leg_ctrl/10)]) + fr_height_diff
+    RR_z = np.array([-(0.14 - right_leg_ctrl/10), -(0.16 + right_leg_ctrl/5), -(0.16 - right_leg_ctrl/5), -(0.13 + right_leg_ctrl/10)]) - 0.02
 
 
     if not reverse:
@@ -211,7 +212,7 @@ def _run_inference(model, input_data):
 
 def phase_transition_controller(act_in, act_out):
     err = act_out - act_in
-    action = act_in + 0.08 * err
+    action = act_in + 0.10 * err
     return action
 
 
@@ -247,8 +248,7 @@ def get_orientation(observation):
         euler_angles[2] = 180 - euler_angles[2]
 
     control_y_direction = euler_angles[2]
-    control_x_direction = euler_angles[0]
-    return control_y_direction, control_x_direction
+    return control_y_direction
 
 def update_y_list(y_list, y):
     y_list = np.roll(y_list, 1)
@@ -284,10 +284,10 @@ while True:
 
         in_step_cnt += 1
 
-        control_y_direction, control_x_direction = get_orientation(current_observations)
+        control_y_direction = get_orientation(current_observations)
         prev_y_list, mean_y_direction = update_y_list(prev_y_list, control_y_direction)
 
-        # Adjust desired angle using keyboard input from A and G keys
+        # Adjust desired angle using keyboard input from A bd G keys
         if keys[pygame.K_a]:
             desired += 1
         if keys[pygame.K_g]:
@@ -299,11 +299,11 @@ while True:
 
         error = (mean_y_direction - desired) * 0.0016
         if error > 0:
-            generated_action = trot_V2(total_steps, reverse=False, fr_height_diff=-0.0,
-                                               left_leg_ctrl=abs(error), right_leg_ctrl=-0.8 * abs(error))
+            generated_action = trot_V2(total_steps, reverse=False, fr_height_diff=-0.005,
+                                               left_leg_ctrl= abs(error), right_leg_ctrl=-0.8 * abs(error))
         else:
-            generated_action = trot_V2(total_steps, reverse=False, fr_height_diff=-0.0,
-                                               left_leg_ctrl=-0.8 * abs(error), right_leg_ctrl=abs(error))
+            generated_action = trot_V2(total_steps, reverse=False, fr_height_diff=-0.01,
+                                               left_leg_ctrl=-0.8 * abs(error), right_leg_ctrl= abs(error))
 
     elif step <= 100 or init_pos:
         action_xyz = init_position()
@@ -315,7 +315,7 @@ while True:
         else:
             init_pos = True
 
-
+    
     action_angle = action_xyz_to_angle(action_xyz, current_action_angle)
     obs, reward, done, _, info = env.step(action_angle)
     current_action_angle = action_angle
