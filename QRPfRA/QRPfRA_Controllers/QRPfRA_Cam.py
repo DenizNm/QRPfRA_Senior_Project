@@ -1,8 +1,8 @@
+import mujoco
 import numpy as np
 from gymnasium import utils
 from gymnasium.envs.mujoco import MujocoEnv
 from gymnasium.spaces import Box
-
 
 class QRPfRA_v3(MujocoEnv, utils.EzPickle):
     metadata = {
@@ -27,15 +27,6 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
             **kwargs,
         )
 
-        self.metadata = {
-            "render_modes": [
-                "human",
-                "rgb_array",
-                "depth_array",
-            ],
-            "render_fps": int(np.round(1.0 / self.dt)),
-        }
-
         obs_size = len(self.data.sensordata.flat.copy())
         self.step_count = 0
 
@@ -49,8 +40,6 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         # TODO: Implement the raspberry pi control over pi
         if self.raspberry_pi:
             pass
-
-
 
         self.do_simulation(action, self.frame_skip)
         observation = self._get_obs()
@@ -67,22 +56,14 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
             reward -= 500
             done = True
 
-
         self.step_count += 1
 
         reward = int(reward)
-        return observation, reward, done, False, info # done, false, info
+        return observation, reward, done, False, info
 
     def _get_obs(self):
         sensor_data = self.data.sensordata.flat.copy()
         return sensor_data
-
-
-    def _unionize_action_buffer(self, action_buffer):
-        """ each degree must consists of 3 integers totaling 36 integers, if an incoming angle for eaxmple 72,
-         it must be converted to 072 rounded to 3 integers. """
-        return [f"{angle:03d}" for angle in action_buffer]
-
 
     def reset_model(self):
         qpos = self.init_qpos
@@ -96,10 +77,7 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
     def _get_reset_info(self):
         return {"works": True}
 
-
-
     def _compute_reward(self, observation, action):
-        # Get absolute position of the base
         baselink_pos = self.get_body_com("base_link")
         FL_hind_limb = observation[9]
         RL_hind_limb = observation[12]
@@ -116,3 +94,10 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         if observation[2] < -4 and self.step_count > 100:
             reward -= 50000
         return reward
+
+    def get_camera_output(self):
+        a = self.sim.render(width=200, height=200, camera_name='track', depth=True)
+        rgb_img = a[0]
+        depth_img = a[1]
+        print(rgb_img)
+        print(depth_img)
