@@ -1,0 +1,8 @@
+04-24 00:01:28 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 392:Plugin executed on: 'darwin'
+04-24 00:01:28 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 393:Plugin executed with python version: '3.9.13 (v3.9.13:6de2ca5339, May 17 2022, 11:37:23) \n[Clang 13.0.0 (clang-1300.0.29.30)]'
+04-24 00:01:28 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 394:KiCad build version: 8.0.1
+04-24 00:01:28 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 395:Plugin version: 3.0.2
+04-24 00:01:28 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 396:Frame repr: <wx._core.Frame object at 0x144dc3550>
+04-24 00:01:28 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 420:Preparing replicator with J6 as a reference
+04-24 00:01:28 com_github_MitjaNemec_ReplicateLayout.replicate_layout 117:getting a list of all footprints on board
+04-24 20:38:36 com_github_MitjaNemec_ReplicateLayout.action_replicate_layout 321:User canceled the dialog
