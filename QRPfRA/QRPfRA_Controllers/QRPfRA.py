@@ -21,7 +21,7 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
     }
 
     def __init__(self,
-                 xml_file="~/vscode_projects/QRPfRA_Senior_Project/QRPfRA/qrpfra_v3_scene.xml",
+                 xml_file=f"{os.path.dirname(os.path.dirname(__file__))}/qrpfra_v3_scene_extended.xml",
                  frame_skip=1, raspberry_pi=False, **kwargs):
 
         utils.EzPickle.__init__(self, xml_file, frame_skip, **kwargs)
@@ -30,7 +30,9 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
             xml_file,
             frame_skip=frame_skip,
             observation_space=None,  # needs to be defined after
-            default_camera_config={},
+            width=640,
+            height=480,
+            camera_name="camera_baselink",
             **kwargs,
         )
 
@@ -99,8 +101,10 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         reward = self._compute_reward(observation, action) - 100
         info = {}
 
+
         if self.render_mode == "human":
             self.render()
+
 
         done = False
 
@@ -157,3 +161,25 @@ class QRPfRA_v3(MujocoEnv, utils.EzPickle):
         if observation[2] < -4 and self.step_count > 100:
             reward -= 50000
         return reward
+
+    def get_rgb_and_depth_image(self):
+        if self.render_mode != "human":
+            if self.render_mode == 'rgb_array':
+                image = self.render()
+                if image is None:
+                    raise RuntimeError("Failed to capture RGB image. Check the render settings and camera configuration.")
+                else:
+                    return image
+
+            # Set the environment to render depth images and capture
+            elif self.render_mode == 'depth_array':
+                image = self.render()
+                if image is None:
+                    raise RuntimeError("Failed to capture depth image. Check the render settings and camera configuration.")
+                else:
+                    return image
+            else:
+                raise ValueError("Invalid render mode. Choose from 'rgb_array' or 'depth_array'.")
+        else:
+            return None
+
