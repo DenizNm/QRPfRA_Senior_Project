@@ -151,9 +151,7 @@ def action_xyz_to_angle(action_xyz, current_action_angle):
 
 
 def get_orientation(observation):
-    #TODO: Obtain the orientation from accelerometer and gyroscope, delete framequat in xml file
     rotation = R.from_quat(observation[21:])
-    # print(rotation)
     coordinates = "YZX"
     euler_angles = rotation.as_euler(coordinates, degrees=True)
     if euler_angles[2] <= 0:
@@ -194,6 +192,12 @@ while True:
             quit()
     keys = pygame.key.get_pressed()
 
+    if keys[pygame.K_p]:
+        if init_pos:
+            init_pos = False
+        else:
+            init_pos = True
+
     if step > 100 and not init_pos:
         action_xyz = generated_action[in_step_cnt, :]
         if in_step_cnt == (total_steps-2):
@@ -217,7 +221,7 @@ while True:
         error = (mean_y_direction - desired) * 0.0016
         if error > 0:
             generated_action = trot_V2(total_steps, reverse=False, fr_height_diff=-0.02,
-                                               left_leg_ctrl= abs(error), right_leg_ctrl=-0.8 * abs(error))
+                                               left_leg_ctrl=abs(error), right_leg_ctrl=-0.8 * abs(error))
         else:
             generated_action = trot_V2(total_steps, reverse=False, fr_height_diff=-0.02,
                                                left_leg_ctrl=-0.8 * abs(error), right_leg_ctrl= abs(error))
@@ -226,19 +230,11 @@ while True:
         action_xyz = init_position()
 
 
-    if keys[pygame.K_p]:
-        if init_pos:
-            init_pos = False
-        else:
-            init_pos = True
-
     
     action_angle = action_xyz_to_angle(action_xyz, current_action_angle)
     obs, reward, done, _, info = env.step(action_angle)
     current_action_angle = action_angle
     current_observations = obs
-
-    print(env.render_mode)
 
 
     if env.render_mode != "human":
